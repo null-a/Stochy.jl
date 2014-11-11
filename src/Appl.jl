@@ -14,7 +14,7 @@ export @appl, sample, factor
 # around as a parameter.
 
 push!(TinyCps.primatives, :println)
-push!(TinyCps.primatives, :cons, :list, :head, :tail, :cat, :reverse)
+push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
 
 macro appl(expr)
     expr = esc(cps(desugar(expr), :(Base.identity)))
@@ -43,11 +43,21 @@ function normalize!(dict)
     end
 end
 
-using DataStructures: LinkedList, Nil, head, tail
-export ==
-==(x::LinkedList,y::LinkedList) = head(x) == head(y) && tail(x) == tail(y)
+import Base.==
+export .., first, second, third, fourth
+
+using DataStructures: Cons, Nil, head, tail, cons
+
+const .. = cons
+
+==(x::Cons,y::Cons) = head(x) == head(y) && tail(x) == tail(y)
+==(x::Nil,y::Cons) = false
+==(x::Cons,y::Nil) = false
 ==(x::Nil,y::Nil) = true
-==(x::Nil,y::LinkedList) = false # Might be redundent.
-==(x::LinkedList,y::Nil) = false # Might be redundent.
+
+first(l::Cons)  = head(l)
+second(l::Cons) = head(tail(l))
+third(l::Cons)  = head(tail(tail(l)))
+fourth(l::Cons) = head(tail(tail(tail(l))))
 
 end
