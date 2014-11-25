@@ -47,7 +47,7 @@ function normalize!(dict)
     end
 end
 
-import Base.==
+import Base.==, Base.hash
 export .., first, second, third, fourth
 
 using DataStructures: Cons, Nil, head, tail, cons
@@ -58,6 +58,8 @@ const .. = cons
 ==(x::Nil,y::Cons) = false
 ==(x::Cons,y::Nil) = false
 ==(x::Nil,y::Nil) = true
+
+hash(x::Cons,h::Uint64) = hash(tail(x), hash(head(x), h))
 
 first(l::Cons)  = head(l)
 second(l::Cons) = head(tail(l))
