@@ -2,16 +2,16 @@ using Appl
 using DataStructures
 
 @appl function transition(state)
-    state==1 ? flip(0.7) : flip(0.3)
+    state ? flip(0.7) : flip(0.3)
 end
 
 @appl function observe(state)
-    state==1 ? flip(0.9) : flip(0.1)
+    state ? flip(0.9) : flip(0.1)
 end
 
 @appl function hmm(n)
     if n == 0
-        local states       = list(1),
+        local states       = list(true),
               observations = list()
         list(states, observations)
     else
@@ -25,7 +25,7 @@ end
 end
 
 dist = @appl enum() do
-    local trueobs = list(0,0,0),
+    local trueobs = list(false,false,false),
           r = hmm(3)
     factor(trueobs == second(r) ? 0 : -Inf)
     tail(reverse(first(r)))

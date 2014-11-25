@@ -31,9 +31,9 @@ end
 # @appl
 Bernoulli(p::Float64, k::Function) = k(Bernoulli(p))
 
-sample(erp::Bernoulli) = rand() < erp.p ? 1 : 0
-support(::Bernoulli) = (0,1)
-score(erp::Bernoulli, x) = x==1 ? log(erp.p) : x==0 ? log(1-erp.p) : error("x not in support")
+sample(erp::Bernoulli) = rand() < erp.p
+support(::Bernoulli) = (true,false)
+score(erp::Bernoulli, x::Bool) = x ? log(erp.p) : log(1-erp.p)
 
 @appl function flip(p)
     sample(Bernoulli(p))
