@@ -5,10 +5,6 @@ using TinyCps
 
 export @appl, sample, factor
 
-# I think this condition could be used to conditionally include the
-# plotting function.
-# println(isdefined(Main, :Gadfly))
-
 # TODO: Fix ugly hack.
 # This is just a hack to save me modifying TinyCps to pass primitives
 # around as a parameter.
@@ -29,6 +25,11 @@ ctx = Prior()
 
 include("erp.jl")
 include("enumerate.jl")
+if isdefined(Main, :Gadfly)
+    include("plot.jl")
+else
+    info("Load Gadfly before Appl to extend plot function.")
+end
 
 # Dispatch based on current context.
 sample(e::ERP, k::Function) = sample(e,k,ctx)
