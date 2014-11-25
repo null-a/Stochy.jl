@@ -3,7 +3,7 @@ module Appl
 using Base.Collections
 using TinyCps
 
-export @appl, sample, factor
+export @appl, sample, factor, score
 
 # TODO: Fix ugly hack.
 # This is just a hack to save me modifying TinyCps to pass primitives
@@ -36,6 +36,9 @@ sample(e::ERP, k::Function) = sample(e,k,ctx)
 factor(score, k::Function) = factor(score,k,ctx)
 
 sample(e::ERP, k::Function, ::Prior) = k(sample(e))
+
+# @appl
+score(e::ERP, x, k::Function) = k(score(e,x))
 
 function normalize!(dict)
     norm = sum(values(dict))
