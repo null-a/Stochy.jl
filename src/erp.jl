@@ -1,6 +1,6 @@
 import Base.show
 import Base.Random.rand
-export Bernoulli, Categorical, flip
+export Bernoulli, Categorical, flip, randominteger
 
 function rand(ps::Vector{Float64})
     @assert isdistribution(ps)
@@ -69,4 +69,14 @@ function show(io::IO, erp::Discrete)
     print(io, "Discrete(")
     show(io, filter((x,p)->p>0,erp.hist))
     print(io, ")")
+end
+
+# TODO: Using the generic Discrete ERP here seems pretty inefficient
+# as there's no need to expand the parameter n into a Dict.
+# TODO: Can this be written as @appl.
+# TODO: Think about naming. Should "uniform" be mentioned here?
+
+# @appl
+function randominteger(n, k::Function)
+    sample(Discrete(Dict([(x,1/n) for x in 1:n])), k)
 end
