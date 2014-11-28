@@ -25,6 +25,7 @@ ctx = Prior()
 
 include("erp.jl")
 include("enumerate.jl")
+include("smc.jl")
 if isdefined(Main, :Gadfly)
     include("plot.jl")
 else
