@@ -29,7 +29,7 @@ type Enum <: Ctx
     score::Float64
     path
     unexplored
-    Enum(frontier) = new(0, Any[], frontier)
+    Enum(queuetype) = new(0, Any[], queuetype())
 end
 
 # @appl
@@ -61,10 +61,10 @@ enumdepthfirst(comp::Function, k::Function) = enum(comp, Stack, k)
 enumbreadthfirst(comp::Function, k::Function) = enum(comp, Queue, k)
 enumlikelyfirst(comp::Function, k::Function) = enum(comp, PriorityQueue, k)
 
-function enum(comp::Function, frontiertype::DataType, k::Function)
+function enum(comp::Function, queuetype::DataType, k::Function)
     global ctx
     returns = Dict{Any,Float64}()
-    ctxold, ctx = ctx, Enum(frontiertype())
+    ctxold, ctx = ctx, Enum(queuetype)
     try
         currentexec = 0
         comp() do value
