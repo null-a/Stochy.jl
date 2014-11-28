@@ -16,7 +16,8 @@ function rand(ps::Vector{Float64})
 end
 
 isprob(x::Float64) = 0 <= x <= 1
-isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-15
+# TODO: Perhaps the epsilon should be based on length(xs)?
+isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
 
 abstract ERP
 
