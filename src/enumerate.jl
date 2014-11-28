@@ -29,8 +29,7 @@ type Enum <: Ctx
     score::Float64
     path
     unexplored
-    returns
-    Enum(frontier) = new(0, Any[], frontier, Dict{Any,Float64}())
+    Enum(frontier) = new(0, Any[], frontier)
 end
 
 # @appl
@@ -64,16 +63,13 @@ enumlikelyfirst(comp::Function, k::Function) = enum(comp, PriorityQueue, k)
 
 function enum(comp::Function, frontiertype::DataType, k::Function)
     global ctx
-    local ctxfin
+    returns = Dict{Any,Float64}()
     ctxold, ctx = ctx, Enum(frontiertype())
     try
         currentexec = 0
-        comp() do val 
+        comp() do value
             currentexec += 1
-            if !haskey(ctx.returns, val)
-                ctx.returns[val] = 0
-            end
-            ctx.returns[val] += exp(ctx.score)
+            returns[value] = get(returns, value, 0) + exp(ctx.score)
             println((ctx.path, exp(ctx.score)))
             if currentexec >= 1000
                 println("maximum executions reached")
@@ -81,9 +77,10 @@ function enum(comp::Function, frontiertype::DataType, k::Function)
                 runnext()
             end
         end
-        normalize!(ctx.returns)
+        normalize!(returns)
     finally
-        ctx, ctxfin = ctxold, ctx
+        ctx = ctxold
     end
-    Discrete(ctxfin.returns, k)
+    # Note: The context must be restored before calling k.
+    Discrete(returns, k)
 end
