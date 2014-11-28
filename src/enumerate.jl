@@ -34,7 +34,7 @@ type Enum <: Ctx
 end
 
 # @appl
-function sample(e::ERP, k::Function, ::Enum)
+function sample(e::ERP, k::Function, ctx::Enum)
     for val in support(e)
         # TODO: A type for the thing we push on the queue might be nice.
         enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(val), [ctx.path, val]))
@@ -43,7 +43,7 @@ function sample(e::ERP, k::Function, ::Enum)
 end
 
 # @appl
-function factor(score, k::Function, ::Enum)
+function factor(score, k::Function, ctx::Enum)
     ctx.score += score
     k(nothing)
 end
