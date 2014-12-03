@@ -14,7 +14,7 @@ push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :sec
 
 macro appl(expr)
     expr = esc(cps(desugar(expr), :(Base.identity)))
-    println(expr)
+    #println(expr)
     #Meta.show_sexpr(expr)
     expr
 end
