@@ -6,7 +6,7 @@ immutable Step
 end
 
 type Particle
-    path::Array{Step}
+    path::Vector{Step}
     value
 end
 
@@ -17,7 +17,7 @@ type PMCMC <: Ctx
     thunk::Function
     currentindex::Int64
     retainedparticle::Union(Nothing,Particle)
-    particles::Array{Particle}
+    particles::Vector{Particle}
     function PMCMC(numparticles, thunk)
         ctx = new(numparticles, thunk, 1, nothing)
         resetparticles!(ctx)
@@ -48,7 +48,7 @@ end
 function resample(particles, weights, n)
     @assert length(particles) == length(weights)
     ps = weights/sum(weights)
-    [deepcopy(particles[rand(ps)]) for _ in 1:n]
+    Particle[deepcopy(particles[rand(ps)]) for _ in 1:n]
 end
 
 function resample(particles, ::Nothing)
