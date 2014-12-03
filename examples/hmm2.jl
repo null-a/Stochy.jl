@@ -17,10 +17,10 @@ dist = @appl enum() do
     hmm(list(false), list(true,true,true,true))
 end
 
-println("Exact: ", dist)
+println("Exact:\n", dist)
 
 dist = @appl smc(100) do
     hmm(list(false), list(true,true,true,true))
 end
 
-println("SMC: ", dist)
+println("SMC:\n", dist)

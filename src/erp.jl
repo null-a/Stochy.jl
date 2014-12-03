@@ -67,8 +67,13 @@ support(erp::Discrete) = erp.xs
 score(erp::Discrete, x) = log(erp.hist[x])
 
 function show(io::IO, erp::Discrete)
-    print(io, "Discrete(")
-    show(io, filter((x,p)->p>0,erp.hist))
+    println(io, "Discrete(")
+    for (x,p) in filter((x,p)->p>0,erp.hist)
+        show(io, x)
+        print(io, " => ")
+        show(io, p)
+        println()
+    end
     print(io, ")")
 end
 
