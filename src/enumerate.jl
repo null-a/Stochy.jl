@@ -67,14 +67,16 @@ function enum(comp::Function, queuetype::DataType, k::Function)
     ctxold, ctx = ctx, Enum(queuetype)
     try
         currentexec = 0
-        comp() do value
-            currentexec += 1
-            returns[value] = get(returns, value, 0) + exp(ctx.score)
-            println((ctx.path, exp(ctx.score)))
-            if currentexec >= 1000
-                println("maximum executions reached")
-            elseif !isempty(ctx.unexplored)
-                runnext()
+        trampoline() do
+            comp() do value
+                currentexec += 1
+                returns[value] = get(returns, value, 0) + exp(ctx.score)
+                println((ctx.path, exp(ctx.score)))
+                if currentexec >= 1000
+                    println("maximum executions reached")
+                elseif !isempty(ctx.unexplored)
+                    runnext()
+                end
             end
         end
         normalize!(returns)
@@ -84,3 +86,7 @@ function enum(comp::Function, queuetype::DataType, k::Function)
     # Note: The context must be restored before calling k.
     Discrete(returns, k)
 end
+
+# Convenience function to allow use of block syntax in enum().
+import TinyCps.trampoline
+trampoline(f::Function) = trampoline(TinyCps.Thunk(f))

@@ -86,7 +86,7 @@ function pmcmc(comp::Function, numiterations, numparticles, k::Function)
             @assert ctx.currentindex == 1
             @assert (i==1?==:!=)(ctx.retainedparticle, nothing)
             @assert all(p->length(p.path)==1 && p.value == nothing, ctx.particles)
-            ctx.particles[ctx.currentindex].path[end].thunk()
+            trampoline(ctx.particles[ctx.currentindex].path[end].thunk)
             ctx.retainedparticle = ctx.particles[1]
             for p in ctx.particles
                 hist[p.value] = get(hist, p.value, 0) + 1
