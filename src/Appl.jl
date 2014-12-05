@@ -13,10 +13,7 @@ push!(TinyCps.primatives, :println)
 push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
 
 macro appl(expr)
-    expr = esc(cps(desugar(expr), :(Base.identity)))
-    #println(expr)
-    #Meta.show_sexpr(expr)
-    expr
+    esc(cps(desugar(expr), identity))
 end
 
 abstract Ctx
