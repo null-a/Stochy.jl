@@ -27,4 +27,14 @@ erp = Appl.Discrete(hist)
 @test all([x in Appl.support(erp) for x in 0:2])
 @test all([Appl.score(erp, x) == log(hist[x]) for x in 0:2])
 
+# Hellinger distance.
+@test hellingerdistance(Bernoulli(0.5), Bernoulli(0.5)) == 0
+@test hellingerdistance(Bernoulli(1.0), Bernoulli(0.0)) == 1
+# Test the case where some values in the support of the exact
+# distribution have not been sampled.
+p = Appl.Discrete([0=>0.25,1=>0.25,2=>0.5])
+q = Appl.Discrete([0=>0.4,2=>0.6], true)
+@test hellingerdistance(p,p) == 0
+@test 0 < hellingerdistance(p,q) < 1
+
 println("Passed!")

@@ -45,6 +45,12 @@ function normalize!(dict)
     end
 end
 
+function normalize(dict)
+    ret = copy(dict)
+    normalize!(ret)
+    ret
+end
+
 import Base.==, Base.hash
 export .., first, second, third, fourth
 

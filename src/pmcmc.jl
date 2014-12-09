@@ -76,6 +76,7 @@ function pmcmcexit(value)
 end
 
 function pmcmc(comp::Function, numiterations, numparticles, k::Function)
+    #exactdist = enum(comp, identity)
     global ctx
     hist = Dict{Any,Float64}()
     ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(pmcmcexit))
@@ -92,6 +93,11 @@ function pmcmc(comp::Function, numiterations, numparticles, k::Function)
                 hist[p.value] = get(hist, p.value, 0) + 1
             end
             resetparticles!(ctx)
+            # Test convergence.
+            # if mod(i,100)==0
+            #     q = Discrete(normalize(hist), true)
+            #     println(hellingerdistance(exactdist, q))
+            # end
         end
         normalize!(hist)
     finally
