@@ -51,7 +51,7 @@ function normalize(dict)
     ret
 end
 
-import Base.==, Base.hash
+import Base.==, Base.hash, Base.first
 export .., first, second, third, fourth
 
 using DataStructures: Cons, Nil, head, tail, cons
