@@ -38,14 +38,14 @@ sample(e::ERP, k::Function, ::Prior) = k(sample(e))
 # @appl
 score(e::ERP, x, k::Function) = k(score(e,x))
 
-function normalize!(dict)
+function normalize!{_}(dict::Dict{_,Float64})
     norm = sum(values(dict))
     for k in keys(dict)
         dict[k] /= norm
     end
 end
 
-function normalize(dict)
+function normalize{_}(dict::Dict{_,Float64})
     ret = copy(dict)
     normalize!(ret)
     ret
