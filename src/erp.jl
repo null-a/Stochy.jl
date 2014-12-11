@@ -1,6 +1,6 @@
 import Base.show
 import Base.Random.rand
-export Bernoulli, Categorical, flip, randominteger, uniform, hellingerdistance
+export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, hellingerdistance
 
 function rand(ps::Vector{Float64})
     @assert isdistribution(ps)
@@ -112,6 +112,28 @@ score(::StandardUniform, _) = 0.0
 
 # @appl
 uniform(k) = sample(StandardUniform(), k)
+
+
+immutable Normal <: ERP
+    mean::Float64 # mu
+    var::Float64  # sigma^2
+    function Normal(mean, var)
+        @assert var > 0.0
+        new(mean,var)
+    end
+end
+
+# @appl
+Normal(mean,var,k) = k(Normal(mean,var))
+
+sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
+# Un-normalized score.
+score(erp::Normal, x) = (x-erp.mean)^2 / (-2. * erp.var)
+
+# @appl
+normal(mean, var, k) = sample(Normal(mean, var), k)
+
+
 
 # What would happen if this was passed two approximating
 # distributions? Currently it would work because support is defined,
