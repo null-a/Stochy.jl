@@ -1,6 +1,6 @@
 import Base.show
 import Base.Random.rand
-export Bernoulli, Categorical, flip, randominteger, hellingerdistance
+export Bernoulli, Categorical, flip, randominteger, uniform, hellingerdistance
 
 function rand(ps::Vector{Float64})
     @assert isdistribution(ps)
@@ -103,6 +103,15 @@ end
 function randominteger(n, k::Function)
     sample(Discrete(Dict([(x,1/n) for x in 1:n])), k)
 end
+
+
+immutable StandardUniform <: ERP; end
+
+sample(::StandardUniform) = rand()
+score(::StandardUniform, _) = 0.0
+
+# @appl
+uniform(k) = sample(StandardUniform(), k)
 
 # What would happen if this was passed two approximating
 # distributions? Currently it would work because support is defined,
