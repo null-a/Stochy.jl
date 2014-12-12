@@ -47,3 +47,8 @@ function randgamma(shape::Float64, scale::Float64)
         scale * g * w^(1./shape)
     end
 end
+
+function randdirichlet(alpha::Vector{Float64})
+    x = Float64[randgamma(a,1.) for a in alpha]
+    x /= sum(x)
+end
