@@ -21,6 +21,7 @@ type Prior <: Ctx end
 ctx = Prior()
 
 include("erp.jl")
+include("rand.jl")
 include("enumerate.jl")
 include("pmcmc.jl")
 if isdefined(Main, :Gadfly)

@@ -1,19 +1,5 @@
 import Base.show
-import Base.Random.rand
 export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, hellingerdistance
-
-function rand(ps::Vector{Float64})
-    @assert isdistribution(ps)
-    acc = 0.
-    r = rand()
-    for (i,p) in enumerate(ps)
-        acc += p
-        if r < acc
-            return i
-        end
-    end
-    error("unreachable")
-end
 
 isprob(x::Float64) = 0 <= x <= 1
 # TODO: Perhaps the epsilon should be based on length(xs)?
