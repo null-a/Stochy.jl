@@ -37,4 +37,14 @@ q = Appl.Discrete([0=>0.4,2=>0.6], true)
 @test hellingerdistance(p,p) == 0
 @test 0 < hellingerdistance(p,q) < 1
 
+# Random number generation.
+
+# Gamma.
+for (shape,scale) in [(1.,1.),(2.,2.),(0.5,1.)]
+    s = Float64[Appl.randgamma(shape,scale) for _ in 1:100_000]
+    m = mean(s)
+    @test_approx_eq_eps(m, shape*scale, 1e-1)
+    @test_approx_eq_eps(varm(s,m), shape*scale^2, 1e-1)
+end
+
 println("Passed!")
