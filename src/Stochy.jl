@@ -1,21 +1,21 @@
 module Stochy
 
 using Base.Collections
-using TinyCps
+using CPS
 
 export @pp, sample, factor, score, observe, observes
 
 # TODO: Fix ugly hack.
-# This is just a hack to save me modifying TinyCps to pass primitives
+# This is just a hack to save me modifying CPS to pass primitives
 # around as a parameter.
 
-push!(TinyCps.primatives, :println)
-push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
+push!(CPS.primatives, :println)
+push!(CPS.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
 
 # Convenience function used to kick-off trampolining in enum() &
 # pmcmc().
-import TinyCps.trampoline
-trampoline(f::Function) = trampoline(TinyCps.Thunk(f))
+import CPS.trampoline
+trampoline(f::Function) = trampoline(CPS.Thunk(f))
 
 macro pp(expr)
     esc(cps(desugar(expr), :identity))
