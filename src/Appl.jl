@@ -13,7 +13,7 @@ push!(TinyCps.primatives, :println)
 push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
 
 macro appl(expr)
-    esc(cps(desugar(expr), identity))
+    esc(cps(desugar(expr), :identity))
 end
 
 abstract Ctx
