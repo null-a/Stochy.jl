@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, dirichlet, hellingerdistance
+export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, dirichlet, categorical, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 # TODO: Perhaps the epsilon should be based on length(xs)?
@@ -29,6 +29,39 @@ end
 @appl function flip()
     flip(0.5)
 end
+
+
+immutable Categorical <: ERP
+    ps::Vector{Float64}
+    xs
+    map # Where map[xs[i]] = ps[i].
+    function Categorical(ps,xs,map)
+        @assert isdistribution(ps)
+        @assert length(xs) == length(ps)
+        new(ps,xs,map)
+    end
+end
+
+# Over 1..K.
+Categorical(ps) = Categorical(ps,1:length(ps),ps)
+# Arbitrary support.
+Categorical(ps,xs) = Categorical(ps,xs,Dict(xs,ps))
+
+# @appl
+Categorical(ps,k::Function) = k(Categorical(ps))
+Categorical(ps,xs,k::Function) = k(Categorical(ps,xs))
+categorical(ps,k::Function) = sample(Categorical(ps), k)
+categorical(ps,xs,k::Function) = sample(Categorical(ps,xs), k)
+
+
+# TODO: Special case for uniform categorical?
+# Categorical(K=5) for uniform over 1..5?
+# Categorical([:a,:b,:c]) for uniform over [..]?
+# How do I distinguish the latter from Categorical([0.1,0.2,0.7])?
+
+sample(erp::Categorical) = erp.xs[rand(erp.ps)]
+score(erp::Categorical, x) = log(erp.map[x])
+support(erp::Categorical) = erp.xs
 
 
 # Consider having a separate type for approximate distributions made

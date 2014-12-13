@@ -61,4 +61,17 @@ for alpha in {[1.,1.],[.5,.5]}
     @test_approx_eq_eps(v, var(s,2), 1e-2)
 end
 
+# Categorical.
+c = Categorical([0.4,0.6])
+@test sample(c) in 1:2
+@test score(c,1) == log(0.4)
+@test score(c,2) == log(0.6)
+@test Appl.support(c) == 1:2
+
+c = Categorical([0.4,0.6], [:a,:b])
+@test sample(c) in [:a,:b]
+@test score(c,:a) == log(0.4)
+@test score(c,:b) == log(0.6)
+@test Appl.support(c) == [:a,:b]
+
 println("Passed!")
