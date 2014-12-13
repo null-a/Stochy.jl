@@ -1,4 +1,4 @@
-using Appl
+using Stochy
 using DataStructures
 
 @appl function transition(state)

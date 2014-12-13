@@ -1,6 +1,6 @@
 # This is the HMM from the particle filter chapter (ch5).
 
-using Appl, DataStructures
+using Stochy, DataStructures
 
 @appl function hmm(states, observations)
     if observations == list()

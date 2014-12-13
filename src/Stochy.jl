@@ -1,4 +1,4 @@
-module Appl
+module Stochy
 
 using Base.Collections
 using TinyCps
@@ -32,7 +32,7 @@ include("pmcmc.jl")
 if isdefined(Main, :Gadfly)
     include("plot.jl")
 else
-    info("Load Gadfly before Appl to extend plot function.")
+    info("Load Gadfly before Stochy to extend plot function.")
 end
 
 # Dispatch based on current context.
