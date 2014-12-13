@@ -4,13 +4,12 @@ function rand(ps::Vector{Float64})
     @assert isdistribution(ps)
     acc = 0.
     r = rand()
-    for (i,p) in enumerate(ps)
-        acc += p
-        if r < acc
-            return i
-        end
+    n = length(ps)
+    for i in 1:n-1
+        @inbounds acc += ps[i]
+        r < acc && return i
     end
-    error("unreachable")
+    n
 end
 
 # Implementation based on "A Simple Method for Generating Gamma
