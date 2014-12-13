@@ -3,7 +3,7 @@ module Appl
 using Base.Collections
 using TinyCps
 
-export @appl, sample, factor, score
+export @appl, sample, factor, score, observe, observes
 
 # TODO: Fix ugly hack.
 # This is just a hack to save me modifying TinyCps to pass primitives
@@ -38,6 +38,15 @@ sample(e::ERP, k::Function, ::Prior) = k(sample(e))
 
 # @appl
 score(e::ERP, x, k::Function) = k(score(e,x))
+
+# TODO: Figure out how to have observe take multiple args.
+
+# Since the "do" syntax function is passed as the first arg, I might
+# be able to switch to having k been the first parameter allowing
+# observe(k, erp, xs...).
+
+observe(erp::ERP, x, k::Function) = factor(score(erp,x), k)
+observes(erp::ERP, xs, k::Function) = factor(sum([score(erp,x) for x in xs]),k)
 
 function normalize!{_}(dict::Dict{_,Float64})
     norm = sum(values(dict))
