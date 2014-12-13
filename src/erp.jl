@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, hellingerdistance
+export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, dirichlet, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 # TODO: Perhaps the epsilon should be based on length(xs)?
@@ -120,6 +120,25 @@ score(erp::Normal, x) = (x-erp.mean)^2 / (-2. * erp.var)
 normal(mean, var, k) = sample(Normal(mean, var), k)
 
 
+immutable Dirichlet <: ERP
+    alpha::Vector{Float64}
+    function Dirichlet(alpha)
+        @assert length(alpha) > 1
+        @assert all([a>0 for a in alpha])
+        new(alpha)
+    end
+end
+
+# Symmetric Dirichlet.
+Dirichlet(alpha::Float64,K::Int64) = Dirichlet(fill(alpha,K))
+
+sample(erp::Dirichlet) = randdirichlet(erp.alpha)
+# Un-normalized score.
+score(erp::Dirichlet, x) = error("not implemented")
+
+# @appl
+dirichlet(alpha, k::Function) = sample(Dirichlet(alpha), k)
+dirichlet(alpha, K, k::Function) = sample(Dirichlet(alpha,K), k)
 
 # What would happen if this was passed two approximating
 # distributions? Currently it would work because support is defined,
