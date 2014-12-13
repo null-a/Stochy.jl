@@ -15,18 +15,18 @@ immutable Bernoulli <: ERP
     end
 end
 
-# @appl
+# @pp
 Bernoulli(p::Float64, k::Function) = k(Bernoulli(p))
 
 sample(erp::Bernoulli) = rand() < erp.p
 support(::Bernoulli) = (true,false)
 score(erp::Bernoulli, x::Bool) = x ? log(erp.p) : log(1-erp.p)
 
-@appl function flip(p)
+@pp function flip(p)
     sample(Bernoulli(p))
 end
 
-@appl function flip()
+@pp function flip()
     flip(0.5)
 end
 
@@ -47,7 +47,7 @@ Categorical(ps) = Categorical(ps,1:length(ps),ps)
 # Arbitrary support.
 Categorical(ps,xs) = Categorical(ps,xs,Dict(xs,ps))
 
-# @appl
+# @pp
 Categorical(ps,k::Function) = k(Categorical(ps))
 Categorical(ps,xs,k::Function) = k(Categorical(ps,xs))
 categorical(ps,k::Function) = sample(Categorical(ps), k)
@@ -88,7 +88,7 @@ end
 
 Discrete(hist) = Discrete(hist, false)
 
-# @appl
+# @pp
 Discrete(hist, k::Function) = k(Discrete(hist))
 
 sample(erp::Discrete) = erp.xs[rand(erp.ps)]
@@ -115,10 +115,10 @@ end
 
 # TODO: Using the generic Discrete ERP here seems pretty inefficient
 # as there's no need to expand the parameter n into a Dict.
-# TODO: Can this be written as @appl.
+# TODO: Can this be written as @pp.
 # TODO: Think about naming. Should "uniform" be mentioned here?
 
-# @appl
+# @pp
 function randominteger(n, k::Function)
     sample(Discrete(Dict([(x,1/n) for x in 1:n])), k)
 end
@@ -129,7 +129,7 @@ immutable StandardUniform <: ERP; end
 sample(::StandardUniform) = rand()
 score(::StandardUniform, _) = 0.0
 
-# @appl
+# @pp
 uniform(k) = sample(StandardUniform(), k)
 
 
@@ -142,14 +142,14 @@ immutable Normal <: ERP
     end
 end
 
-# @appl
+# @pp
 Normal(mean,var,k) = k(Normal(mean,var))
 
 sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
 # Un-normalized score.
 score(erp::Normal, x) = (x-erp.mean)^2 / (-2. * erp.var)
 
-# @appl
+# @pp
 normal(mean, var, k) = sample(Normal(mean, var), k)
 
 
@@ -169,7 +169,7 @@ sample(erp::Dirichlet) = randdirichlet(erp.alpha)
 # Un-normalized score.
 score(erp::Dirichlet, x) = error("not implemented")
 
-# @appl
+# @pp
 dirichlet(alpha, k::Function) = sample(Dirichlet(alpha), k)
 dirichlet(alpha, K, k::Function) = sample(Dirichlet(alpha,K), k)
 

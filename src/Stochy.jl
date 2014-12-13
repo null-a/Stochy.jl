@@ -3,7 +3,7 @@ module Stochy
 using Base.Collections
 using TinyCps
 
-export @appl, sample, factor, score, observe, observes
+export @pp, sample, factor, score, observe, observes
 
 # TODO: Fix ugly hack.
 # This is just a hack to save me modifying TinyCps to pass primitives
@@ -17,7 +17,7 @@ push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :sec
 import TinyCps.trampoline
 trampoline(f::Function) = trampoline(TinyCps.Thunk(f))
 
-macro appl(expr)
+macro pp(expr)
     esc(cps(desugar(expr), :identity))
 end
 
@@ -41,7 +41,7 @@ factor(score, k::Function) = factor(score,k,ctx)
 
 sample(e::ERP, k::Function, ::Prior) = k(sample(e))
 
-# @appl
+# @pp
 score(e::ERP, x, k::Function) = k(score(e,x))
 
 # TODO: Figure out how to have observe take multiple args.

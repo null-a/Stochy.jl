@@ -1,7 +1,7 @@
 using Stochy
 using Base.Test
 
-dist = @appl enum() do
+dist = @pp enum() do
     local a = flip(0.5),
           b = flip(0.5),
           c = flip(0.5)
@@ -13,7 +13,7 @@ println(dist)
 
 # Ensure the context is restored when an exception occurs during
 # enumeration.
-try @appl enum(()->foo())
+try @pp enum(()->foo())
 catch e
     if isa(e, UndefVarError)
         @test Stochy.ctx == Stochy.Prior()

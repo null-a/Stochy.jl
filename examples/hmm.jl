@@ -1,15 +1,15 @@
 using Stochy
 using DataStructures
 
-@appl function transition(state)
+@pp function transition(state)
     state ? flip(0.7) : flip(0.3)
 end
 
-@appl function observe(state)
+@pp function observe(state)
     state ? flip(0.9) : flip(0.1)
 end
 
-@appl function hmm(n)
+@pp function hmm(n)
     if n == 0
         local states       = list(true),
               observations = list()
@@ -24,7 +24,7 @@ end
     end
 end
 
-dist = @appl enum() do
+dist = @pp enum() do
     local trueobs = list(false,false,false),
           r = hmm(3)
     factor(trueobs == second(r) ? 0 : -Inf)

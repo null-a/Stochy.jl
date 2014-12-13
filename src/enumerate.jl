@@ -32,7 +32,7 @@ type Enum <: Ctx
     Enum(queuetype) = new(0, Any[], queuetype())
 end
 
-# @appl
+# @pp
 function sample(e::ERP, k::Function, ctx::Enum)
     for val in support(e)
         # TODO: A type for the thing we push on the queue might be nice.
@@ -41,7 +41,7 @@ function sample(e::ERP, k::Function, ctx::Enum)
     runnext()
 end
 
-# @appl
+# @pp
 function factor(score, k::Function, ctx::Enum)
     ctx.score += score
     k(nothing)
@@ -54,7 +54,7 @@ function runnext()
     cont()
 end
 
-# @appl
+# @pp
 enum(comp::Function, k::Function) = enumbreadthfirst(comp, k)
 
 enumdepthfirst(comp::Function, k::Function) = enum(comp, Stack, k)

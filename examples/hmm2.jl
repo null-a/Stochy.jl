@@ -2,7 +2,7 @@
 
 using Stochy, DataStructures
 
-@appl function hmm(states, observations)
+@pp function hmm(states, observations)
     if observations == list()
         reverse(states)
     else
@@ -13,13 +13,13 @@ using Stochy, DataStructures
     end
 end
 
-dist = @appl enum() do
+dist = @pp enum() do
     hmm(list(false), list(true,true,true,true))
 end
 
 println("Exact:\n", dist)
 
-dist = @appl smc(100) do
+dist = @pp smc(100) do
     hmm(list(false), list(true,true,true,true))
 end
 
