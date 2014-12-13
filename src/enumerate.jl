@@ -71,7 +71,11 @@ function enum(comp::Function, queuetype::DataType, k::Function)
             comp() do value
                 currentexec += 1
                 returns[value] = get(returns, value, 0) + exp(ctx.score)
-                println((ctx.path, exp(ctx.score)))
+                # TODO: How best can this be presented?
+                # It's useful/interesting to see when playing with
+                # e.g. enumlikelyfirst() and re-ordering factor
+                # statements etc.
+                #println((ctx.path, exp(ctx.score)))
                 if currentexec >= 1000
                     println("maximum executions reached")
                 elseif !isempty(ctx.unexplored)
