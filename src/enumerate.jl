@@ -86,7 +86,3 @@ function enum(comp::Function, queuetype::DataType, k::Function)
     # Note: The context must be restored before calling k.
     Discrete(returns, k)
 end
-
-# Convenience function to allow use of block syntax in enum().
-import TinyCps.trampoline
-trampoline(f::Function) = trampoline(TinyCps.Thunk(f))

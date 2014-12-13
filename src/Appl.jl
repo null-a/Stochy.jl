@@ -12,6 +12,11 @@ export @appl, sample, factor, score, observe, observes
 push!(TinyCps.primatives, :println)
 push!(TinyCps.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
 
+# Convenience function used to kick-off trampolining in enum() &
+# pmcmc().
+import TinyCps.trampoline
+trampoline(f::Function) = trampoline(TinyCps.Thunk(f))
+
 macro appl(expr)
     esc(cps(desugar(expr), :identity))
 end
