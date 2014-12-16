@@ -1,21 +1,8 @@
 module Stochy
 
 using Base.Collections
-using CPS
 
 export @pp, sample, factor, score, observe, observes
-
-# TODO: Fix ugly hack.
-# This is just a hack to save me modifying CPS to pass primitives
-# around as a parameter.
-
-push!(CPS.primatives, :println)
-push!(CPS.primatives, :cons, :list, :tail, :cat, :reverse, :.., :first, :second, :third, :fourth)
-
-# Convenience function used to kick-off trampolining in enum() &
-# pmcmc().
-import CPS.trampoline
-trampoline(f::Function) = trampoline(CPS.Thunk(f))
 
 macro pp(expr)
     esc(cps(desugar(expr), :identity))
@@ -25,6 +12,7 @@ abstract Ctx
 type Prior <: Ctx end
 ctx = Prior()
 
+include("cps.jl")
 include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")

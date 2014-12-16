@@ -7,10 +7,6 @@ Stochy is a probabilistic programming language embedded within Julia. Models are
 - [Introduction](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Introduction.ipynb)
 - [Marbles](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Marbles.ipynb)
 
-## Dependencies
-
-[CPS.jl](https://github.com/null-a/CPS.jl) needs to be installed manually until Stochy.jl is registered as a package.
-
 ## Citations
 
 1. Wood, F., J. W. van de Meent, and V. Mansinghka. 2014. “A New Approach to Probabilistic Programming Inference.” In Artificial Intelligence and Statistics, 1024–32.
