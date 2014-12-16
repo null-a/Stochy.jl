@@ -103,13 +103,8 @@ function score(erp::Discrete, x)
 end
 
 function show(io::IO, erp::Discrete)
-    println(io, "Discrete(")
-    for (x,p) in filter((x,p)->p>0,erp.hist)
-        show(io, x)
-        print(io, " => ")
-        show(io, p)
-        println()
-    end
+    print(io, "Discrete(")
+    show(io, filter((x,p)->p>0,erp.hist))
     print(io, ")")
 end
 
