@@ -76,9 +76,8 @@ function pmcmcexit(value)
 end
 
 function pmcmc(comp::Function, numiterations, numparticles, k::Function)
-    #exactdist = enum(comp, identity)
     global ctx
-    hist = Dict{Any,Float64}()
+    counts = Dict{Any,Int64}()
     ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(pmcmcexit))
     try
         for i in 1:numiterations
@@ -90,20 +89,14 @@ function pmcmc(comp::Function, numiterations, numparticles, k::Function)
             trampoline(ctx.particles[ctx.currentindex].path[end].thunk)
             ctx.retainedparticle = ctx.particles[1]
             for p in ctx.particles
-                hist[p.value] = get(hist, p.value, 0) + 1
+                counts[p.value] = get(counts, p.value, 0) + 1
             end
             resetparticles!(ctx)
-            # Test convergence.
-            # if mod(i,100)==0
-            #     q = Discrete(normalize(hist), true)
-            #     println(hellingerdistance(exactdist, q))
-            # end
         end
-        normalize!(hist)
     finally
         ctx = ctxold
     end
-    Discrete(hist, k)
+    k(Empirical(counts))
 end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first

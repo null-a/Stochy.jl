@@ -5,6 +5,13 @@ isprob(x::Float64) = 0 <= x <= 1
 # TODO: Perhaps the epsilon should be based on length(xs)?
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
 
+function showfield(io::IO, x, field)
+    show(io,typeof(x))
+    print(io,"(")
+    show(io,getfield(x,field))
+    print(io,")")
+end
+
 abstract ERP
 
 immutable Bernoulli <: ERP
@@ -46,6 +53,7 @@ end
 Categorical(ps) = Categorical(ps,1:length(ps),ps)
 # Arbitrary support.
 Categorical(ps,xs) = Categorical(ps,xs,Dict(xs,ps))
+Categorical(d::Dict) = Categorical(collect(values(d)), collect(keys(d)), d)
 
 # @pp
 Categorical(ps,k::Function) = k(Categorical(ps))
@@ -54,70 +62,45 @@ categorical(ps,k::Function) = sample(Categorical(ps), k)
 categorical(ps,xs,k::Function) = sample(Categorical(ps,xs), k)
 
 
-# TODO: Special case for uniform categorical?
+# TODO: Special case for uniform categorical? (Similar to randominteger.)
 # Categorical(K=5) for uniform over 1..5?
 # Categorical([:a,:b,:c]) for uniform over [..]?
 # How do I distinguish the latter from Categorical([0.1,0.2,0.7])?
-
+ 
 sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
 support(erp::Categorical) = erp.xs
 
+# @pp
+function randominteger(n, k::Function)
+    sample(Categorical(fill(1/n,n)), k)
+end
 
-# Consider having a separate type for approximate distributions made
-# from samples (empirical distribution?) rather than the "isapprox"
-# flag and accompanying conditionals. This is perhaps best tackled
-# after adding some more ERP so that I can better understand what the
-# type hierarchy for discrete/continuous ERP needs to look like.
-
-immutable Discrete <: ERP
-    hist::Dict{Any,Float64}
-    xs::Array
-    ps::Array{Float64}
-    isapprox::Bool
-    function Discrete(hist, isapprox)
-        # TODO: I'm assuming that keys/values iterate over the dict in
-        # the same order. Check that they do otherwise values will
-        # have their probabilities mixed up.
-        xs = collect(keys(hist))
-        ps = collect(values(hist))
-        @assert isdistribution(ps)
-        new(hist, xs, ps, isapprox)
+immutable Empirical <: ERP
+    counts::Dict{Any,Int64} # Sample counts.
+    xs::Vector
+    ps::Vector{Float64}
+    n::Int64
+    function Empirical(counts)
+        xs = collect(keys(counts))
+        ps = collect(values(counts))
+        n = sum(ps)
+        ps /= n
+        new(counts, xs, ps, n)
     end
 end
 
-Discrete(hist) = Discrete(hist, false)
+sample(erp::Empirical) = erp.xs[rand(erp.ps)]
 
-# @pp
-Discrete(hist, k::Function) = k(Discrete(hist))
+# This is potentially misleading as we can't distinguish between an x
+# that isn't in the support and one which has zero probability. Could
+# the support be infered by looking at the distribution from which the
+# sampled variables were originally drawn?
 
-sample(erp::Discrete) = erp.xs[rand(erp.ps)]
-# This is potentially misleading for approximating distributions as we
-# don't really know the support. i.e. We can't (currently, at least)
-# distinguish between an x which is not in the support and one which
-# has zero probability.
-support(erp::Discrete) = erp.xs
-function score(erp::Discrete, x)
-    prob = erp.isapprox ? get(erp.hist, x, 0.) : erp.hist[x]
-    log(prob)
-end
+support(erp::Empirical) = keys(erp.counts)
+score(erp::Empirical, x) = log(erp.counts[x]/erp.n)
 
-function show(io::IO, erp::Discrete)
-    print(io, "Discrete(")
-    show(io, filter((x,p)->p>0,erp.hist))
-    print(io, ")")
-end
-
-# TODO: Using the generic Discrete ERP here seems pretty inefficient
-# as there's no need to expand the parameter n into a Dict.
-# TODO: Can this be written as @pp.
-# TODO: Think about naming. Should "uniform" be mentioned here?
-
-# @pp
-function randominteger(n, k::Function)
-    sample(Discrete(Dict([(x,1/n) for x in 1:n])), k)
-end
-
+show(io::IO, erp::Empirical) = showfield(io, erp, :counts)
 
 immutable StandardUniform <: ERP; end
 
@@ -168,17 +151,18 @@ score(erp::Dirichlet, x) = error("not implemented")
 dirichlet(alpha, k::Function) = sample(Dirichlet(alpha), k)
 dirichlet(alpha, K, k::Function) = sample(Dirichlet(alpha,K), k)
 
-# What would happen if this was passed two approximating
-# distributions? Currently it would work because support is defined,
-# but I'm not sure it does the right thing as I think all values in
-# p.xs union q.xs would need to be considered. Perhaps this supports
-# the idea of having a specific type for approximating distributions.
-function hellingerdistance(p::ERP, q::ERP)
-    acc = 0.0
-    for x in support(p)
+
+hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")
+
+function hellingerdistance(p::ERP, q::Empirical)
+    psupp = support(p)
+    qsupp = support(q)
+    @assert issubset(qsupp, psupp)
+    acc = 0.
+    for x in psupp
         px = exp(score(p,x))
-        qx = exp(score(q,x))
+        qx = x in qsupp ? exp(score(q,x)) : 0.
         acc += (sqrt(px)-sqrt(qx))^2
     end
-    sqrt(acc/2.0)
+    sqrt(acc/2.)
 end

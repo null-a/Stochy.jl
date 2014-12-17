@@ -12,7 +12,7 @@ dist = @pp enum() do
 end
 
 println(dist)
-@test dist.hist == {0=>0.125,1=>0.375,2=>0.375,3=>0.125}
+@test dist.map == {0=>0.125,1=>0.375,2=>0.375,3=>0.125}
 
 # Ensure the context is restored when an exception occurs during
 # enumeration.
@@ -25,20 +25,26 @@ catch e
     end
 end
 
-hist = [0=>0.2, 1=>0.3, 2=>0.5]
-erp = Stochy.Discrete(hist)
+hist = [0=>2, 1=>3, 2=>5]
+erp = Stochy.Empirical(hist)
+@test erp.n == 10
 @test all([x in Stochy.support(erp) for x in 0:2])
-@test all([Stochy.score(erp, x) == log(hist[x]) for x in 0:2])
+@test length(Stochy.support(erp)) == 3
+for x in 0:2
+    @test_approx_eq log(hist[x]*.1) Stochy.score(erp,x)
+end
+
+@test all([sample(erp) in 0:2 for _ in 1:5])
+
 
 # Hellinger distance.
-@test hellingerdistance(Bernoulli(0.5), Bernoulli(0.5)) == 0
-@test hellingerdistance(Bernoulli(1.0), Bernoulli(0.0)) == 1
-# Test the case where some values in the support of the exact
-# distribution have not been sampled.
-p = Stochy.Discrete([0=>0.25,1=>0.25,2=>0.5])
-q = Stochy.Discrete([0=>0.4,2=>0.6], true)
-@test hellingerdistance(p,p) == 0
-@test 0 < hellingerdistance(p,q) < 1
+p = Stochy.Categorical([0=>0.25,1=>0.25,2=>0.5])
+q = Stochy.Empirical([0=>2,2=>3])
+@test_approx_eq_eps 0.36885 hellingerdistance(p,q) 1e-5
+@test_throws ErrorException hellingerdistance(q,q)
+q = Stochy.Empirical([3=>1]) # Different support to p.
+@test_throws ErrorException hellingerdistance(p,q)
+
 
 # Random number generation.
 

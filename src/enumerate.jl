@@ -88,5 +88,5 @@ function enum(comp::Function, queuetype::DataType, k::Function)
         ctx = ctxold
     end
     # Note: The context must be restored before calling k.
-    Discrete(returns, k)
+    k(Categorical(returns))
 end
