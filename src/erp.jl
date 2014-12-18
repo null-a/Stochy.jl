@@ -71,6 +71,8 @@ sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
 support(erp::Categorical) = erp.xs
 
+show(io::IO, erp::Categorical) = showfield(io, erp, :map)
+
 # @pp
 function randominteger(n, k::Function)
     sample(Categorical(fill(1/n,n)), k)
