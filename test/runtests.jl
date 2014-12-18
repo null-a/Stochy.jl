@@ -25,6 +25,25 @@ catch e
     end
 end
 
+dist = @pp pmcmc(5,5) do
+    local x = flip()
+    factor(x ? 0 : -1)
+    x
+end
+
+@test length(Stochy.support(dist)) == 2
+@test true in Stochy.support(dist)
+@test false in Stochy.support(dist)
+
+try @pp pmcmc(()->foo(),1,1)
+catch e
+    if isa(e, UndefVarError)
+        @test Stochy.ctx == Stochy.Prior()
+    else
+        rethrow(e)
+    end
+end
+
 hist = [0=>2, 1=>3, 2=>5]
 erp = Stochy.Empirical(hist)
 @test erp.n == 10
