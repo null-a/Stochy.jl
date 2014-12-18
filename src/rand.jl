@@ -1,7 +1,7 @@
 import Base.Random.rand
 
+# This assumes that ps is normalized.
 function rand(ps::Vector{Float64})
-    @assert isdistribution(ps)
     acc = 0.
     r = rand()
     n = length(ps)
