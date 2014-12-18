@@ -2,8 +2,6 @@ using Stochy
 import Stochy: @cps, cps, desugar, striplineinfo
 using Base.Test
 
-
-
 dist = @pp enum() do
     local a = flip(0.5),
           b = flip(0.5),
@@ -11,7 +9,6 @@ dist = @pp enum() do
     a + b + c
 end
 
-println(dist)
 @test dist.map == {0=>0.125,1=>0.375,2=>0.375,3=>0.125}
 
 # Ensure the context is restored when an exception occurs during
@@ -203,6 +200,5 @@ end
 
 @test expr_eq(desugar(:(local x=1, y=2)),
                       :(begin; local x=1; local y=2 end)) 
-
 
 println("Passed!")
