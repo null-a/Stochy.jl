@@ -81,6 +81,18 @@ c = Categorical([0.4,0.6], [:a,:b])
 @test score(c,:b) == log(0.6)
 @test Stochy.support(c) == [:a,:b]
 
+# Dirichlet.
+d = Dirichlet(1.,2)
+s = sample(d)
+@test length(s) == 2
+@test sum(s) == 1
+
+# Normal.
+n = Normal(0,1)
+s = sample(n)
+@test 0 < exp(score(n,s)) < 1
+
+
 # CPS
 
 x = 0

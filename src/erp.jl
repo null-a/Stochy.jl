@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, flip, randominteger, uniform, normal, dirichlet, categorical, hellingerdistance
+export Bernoulli, Categorical, Normal, Dirichlet, flip, randominteger, uniform, normal, dirichlet, categorical, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 # TODO: Perhaps the epsilon should be based on length(xs)?
