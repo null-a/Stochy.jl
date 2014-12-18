@@ -36,6 +36,12 @@ end
 
 @test all([sample(erp) in 0:2 for _ in 1:5])
 
+samples = Stochy.recoversamples(erp)
+@test length(samples) == 10
+for (x,c) in hist
+    @test sum(samples .== x) == c
+end
+
 
 # Hellinger distance.
 p = Stochy.Categorical([0=>0.25,1=>0.25,2=>0.5])

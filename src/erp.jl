@@ -102,6 +102,18 @@ score(erp::Empirical, x) = log(erp.counts[x]/erp.n)
 
 show(io::IO, erp::Empirical) = showfield(io, erp, :counts)
 
+function recoversamples(erp::Empirical)
+    ret = Array(Any, erp.n)
+    i = 1
+    for (x,c) in erp.counts
+        for _ in 1:c
+            ret[i] = x
+            i += 1
+        end
+    end
+    ret
+end
+
 immutable StandardUniform <: ERP; end
 
 sample(::StandardUniform) = rand()
