@@ -81,7 +81,6 @@ function pmcmc(comp::Function, numiterations, numparticles, k::Function)
     ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(pmcmcexit))
     try
         for i in 1:numiterations
-            # TODO: Remove these or replace with tests?
             # Check some invariants.
             @assert ctx.currentindex == 1
             @assert (i==1?==:!=)(ctx.retainedparticle, nothing)

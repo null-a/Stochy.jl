@@ -35,7 +35,6 @@ end
 # @pp
 function sample(e::ERP, k::Function, ctx::Enum)
     for val in support(e)
-        # TODO: A type for the thing we push on the queue might be nice.
         enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(val), [ctx.path, val]))
     end
     runnext()
@@ -71,11 +70,6 @@ function enum(comp::Function, queuetype::DataType, k::Function)
             comp() do value
                 currentexec += 1
                 returns[value] = get(returns, value, 0) + exp(ctx.score)
-                # TODO: How best can this be presented?
-                # It's useful/interesting to see when playing with
-                # e.g. enumlikelyfirst() and re-ordering factor
-                # statements etc.
-                #println((ctx.path, exp(ctx.score)))
                 if currentexec >= 1000
                     println("maximum executions reached")
                 elseif !isempty(ctx.unexplored)

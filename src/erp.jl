@@ -2,7 +2,6 @@ import Base.show
 export Bernoulli, Categorical, Normal, Dirichlet, flip, randominteger, uniform, normal, dirichlet, categorical, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
-# TODO: Perhaps the epsilon should be based on length(xs)?
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
 
 function showfield(io::IO, x, field)
@@ -61,12 +60,6 @@ Categorical(ps,xs,k::Function) = k(Categorical(ps,xs))
 categorical(ps,k::Function) = sample(Categorical(ps), k)
 categorical(ps,xs,k::Function) = sample(Categorical(ps,xs), k)
 
-
-# TODO: Special case for uniform categorical? (Similar to randominteger.)
-# Categorical(K=5) for uniform over 1..5?
-# Categorical([:a,:b,:c]) for uniform over [..]?
-# How do I distinguish the latter from Categorical([0.1,0.2,0.7])?
- 
 sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
 support(erp::Categorical) = erp.xs
