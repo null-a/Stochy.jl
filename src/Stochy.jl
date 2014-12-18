@@ -48,9 +48,12 @@ function normalize!{_}(dict::Dict{_,Float64})
     end
 end
 
-function normalize{_}(dict::Dict{_,Float64})
-    ret = copy(dict)
-    normalize!(ret)
+function normalize{K,V<:Number}(dict::Dict{K,V})
+    ret = Dict{K,Float64}()
+    norm = sum(values(dict))
+    for k in keys(dict)
+        ret[k] = dict[k]/norm
+    end
     ret
 end
 
