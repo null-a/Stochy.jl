@@ -79,7 +79,7 @@ end
 # http://matt.might.net/articles/cps-conversion/
 # Essentials of Programming Languages (3rd Ed.) [Friedman & Wand]
 
-# | CPS               | EoPL              | Might's Scheme CPS |                 |
+# | CPS                   | EoPL              | Might's Scheme CPS |                 |
 # | tc                    | cps-of-exp        | T-c                |                 |
 # | tk(::Function, expr)  | cps-of-exp/ctx    | T-k                | Ex. 6.30, p225. |
 # | tk(::Function, exprs) | cps-of-exps       | T*-k               |                 |
