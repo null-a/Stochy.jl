@@ -102,7 +102,11 @@ sample(erp::Empirical) = erp.xs[rand(erp.ps)]
 support(erp::Empirical) = keys(erp.counts)
 score(erp::Empirical, x) = log(erp.counts[x]/erp.n)
 
-show(io::IO, erp::Empirical) = showfield(io, erp, :counts)
+function show(io::IO, erp::Empirical)
+    print(io,"Empirical(")
+    show(io,normalize(erp.counts))
+    print(io,")")
+end
 
 function recoversamples(erp::Empirical)
     ret = Array(Any, erp.n)
