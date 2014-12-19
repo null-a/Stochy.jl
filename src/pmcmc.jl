@@ -29,11 +29,11 @@ function resetparticles!(ctx::PMCMC)
     ctx.particles = [Particle(ctx.thunk) for _ in 1:ctx.numparticles]
 end
 
-function sample(e::ERP, k::Function, ::PMCMC)
+function sample(k::Function, e::ERP, ::PMCMC)
     k(sample(e))
 end
 
-function factor(score, k::Function, ctx::PMCMC)
+function factor(k::Function, score, ctx::PMCMC)
     push!(ctx.particles[ctx.currentindex].path, Step(()->k(nothing), score))
     if ctx.currentindex < length(ctx.particles)
         ctx.currentindex += 1
@@ -75,7 +75,7 @@ function pmcmcexit(value)
     end
 end
 
-function pmcmc(comp::Function, numiterations, numparticles, k::Function)
+function pmcmc(k::Function, comp::Function, numiterations, numparticles)
     global ctx
     counts = Dict{Any,Int64}()
     ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(pmcmcexit))
@@ -100,4 +100,4 @@ end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first
 # iteration.
-smc(comp::Function, n, k::Function) = pmcmc(comp,1,n,k)
+smc(k::Function, comp::Function, n) = pmcmc(k,comp,1,n)

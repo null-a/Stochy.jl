@@ -111,7 +111,7 @@ function tc(expr, cont)
         args = expr.args[1].args[2:end]
         body = expr.args[2]
         v = gensym()
-        :($cont(function $f($(args...), $v); $(tc(body, v)); end))
+        :($cont(function $f($v, $(args...)); $(tc(body, v)); end))
     elseif expr.head == :||
         # Convert to if statement.
         @assert length(expr.args) == 2
@@ -128,7 +128,7 @@ function tc(expr, cont)
         end
     elseif expr.head == :call
         tk(expr.args) do f, e...
-            :($f($(e...), $cont))
+            :($f($cont, $(e...)))
         end
     elseif expr.head == :.
         @assert isa(expr.args[2], QuoteNode) || isa(expr.args[2], Expr)
@@ -205,7 +205,7 @@ function m(expr::Expr)
         k = symbol("##k00")
         args = procargs(expr.args[1])
         body = expr.args[2]
-        :(($(args...), $k) -> $(tc(body, k)))
+        :(($k, $(args...)) -> $(tc(body, k)))
     elseif expr.head == :quote
         expr
     else

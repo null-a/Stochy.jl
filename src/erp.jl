@@ -22,7 +22,7 @@ immutable Bernoulli <: ERP
 end
 
 # @pp
-Bernoulli(p::Float64, k::Function) = k(Bernoulli(p))
+Bernoulli(k::Function, p::Float64) = k(Bernoulli(p))
 
 sample(erp::Bernoulli) = rand() < erp.p
 support(::Bernoulli) = (true,false)
@@ -55,10 +55,10 @@ Categorical(ps,xs) = Categorical(ps,xs,Dict(xs,ps))
 Categorical(d::Dict) = Categorical(collect(values(d)), collect(keys(d)), d)
 
 # @pp
-Categorical(ps,k::Function) = k(Categorical(ps))
-Categorical(ps,xs,k::Function) = k(Categorical(ps,xs))
-categorical(ps,k::Function) = sample(Categorical(ps), k)
-categorical(ps,xs,k::Function) = sample(Categorical(ps,xs), k)
+Categorical(k::Function,ps) = k(Categorical(ps))
+Categorical(k::Function,ps,xs) = k(Categorical(ps,xs))
+categorical(k::Function,ps) = sample(k, Categorical(ps))
+categorical(k::Function,ps,xs) = sample(k, Categorical(ps,xs))
 
 sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
@@ -67,8 +67,8 @@ support(erp::Categorical) = erp.xs
 show(io::IO, erp::Categorical) = showfield(io, erp, :map)
 
 # @pp
-function randominteger(n, k::Function)
-    sample(Categorical(fill(1/n,n)), k)
+function randominteger(k::Function, n)
+    sample(k, Categorical(fill(1/n,n)))
 end
 
 immutable Empirical <: ERP
@@ -119,7 +119,7 @@ sample(::StandardUniform) = rand()
 score(::StandardUniform, _) = 0.0
 
 # @pp
-uniform(k) = sample(StandardUniform(), k)
+uniform(k) = sample(k, StandardUniform())
 
 
 immutable Normal <: ERP
@@ -132,14 +132,14 @@ immutable Normal <: ERP
 end
 
 # @pp
-Normal(mean,var,k) = k(Normal(mean,var))
+Normal(k,mean,var) = k(Normal(mean,var))
 
 sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
 # Un-normalized score.
 score(erp::Normal, x) = (x-erp.mean)^2 / (-2. * erp.var)
 
 # @pp
-normal(mean, var, k) = sample(Normal(mean, var), k)
+normal(k, mean, var) = sample(k, Normal(mean, var))
 
 
 immutable Dirichlet <: ERP
@@ -159,8 +159,8 @@ sample(erp::Dirichlet) = randdirichlet(erp.alpha)
 score(erp::Dirichlet, x) = error("not implemented")
 
 # @pp
-dirichlet(alpha, k::Function) = sample(Dirichlet(alpha), k)
-dirichlet(alpha, K, k::Function) = sample(Dirichlet(alpha,K), k)
+dirichlet(k::Function, alpha) = sample(k, Dirichlet(alpha))
+dirichlet(k::Function, alpha, K) = sample(k, Dirichlet(alpha,K))
 
 
 hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")

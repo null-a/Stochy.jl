@@ -97,7 +97,7 @@ s = sample(n)
 # CPS
 
 x = 0
-cpsid(x, k) = k(x)
+cpsid(k,x) = k(x)
 
 id(x) = x
 
@@ -114,6 +114,7 @@ id(x) = x
 
 # Function calls
 @test (@cps cpsid(0)) == 0
+@test (@cps ((a...)->a)(1,2)) == (1,2)
 
 # Primatives
 @test (@cps 1+1) == 2
@@ -175,7 +176,7 @@ end
 @test (@cps begin; local a=begin; 1; end; a; end) == 1
 
 # Dot syntax
-module M cpsid(x, k) = k(x) end
+module M cpsid(k,x) = k(x) end
 getmod(k) = k(M)
 @test (@cps M.cpsid) == M.cpsid
 @test (@cps M.cpsid(0)) == 0

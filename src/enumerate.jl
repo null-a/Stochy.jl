@@ -33,7 +33,7 @@ type Enum <: Ctx
 end
 
 # @pp
-function sample(e::ERP, k::Function, ctx::Enum)
+function sample(k::Function, e::ERP, ctx::Enum)
     for val in support(e)
         enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(val), [ctx.path, val]))
     end
@@ -41,7 +41,7 @@ function sample(e::ERP, k::Function, ctx::Enum)
 end
 
 # @pp
-function factor(score, k::Function, ctx::Enum)
+function factor(k::Function, score, ctx::Enum)
     ctx.score += score
     k(nothing)
 end
@@ -54,13 +54,13 @@ function runnext()
 end
 
 # @pp
-enum(comp::Function, k::Function) = enumbreadthfirst(comp, k)
+enum(k::Function, comp::Function) = enumbreadthfirst(k, comp)
 
-enumdepthfirst(comp::Function, k::Function) = enum(comp, Stack, k)
-enumbreadthfirst(comp::Function, k::Function) = enum(comp, Queue, k)
-enumlikelyfirst(comp::Function, k::Function) = enum(comp, PriorityQueue, k)
+enumdepthfirst(k::Function, comp::Function) = enum(k, comp, Stack)
+enumbreadthfirst(k::Function, comp::Function) = enum(k, comp, Queue)
+enumlikelyfirst(k::Function, comp::Function) = enum(k, comp, PriorityQueue)
 
-function enum(comp::Function, queuetype::DataType, k::Function)
+function enum(k::Function, comp::Function, queuetype::DataType)
     global ctx
     returns = Dict{Any,Float64}()
     ctxold, ctx = ctx, Enum(queuetype)

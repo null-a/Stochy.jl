@@ -30,16 +30,16 @@ else
 end
 
 # Dispatch based on current context.
-sample(e::ERP, k::Function) = sample(e,k,ctx)
-factor(score, k::Function) = factor(score,k,ctx)
+sample(k::Function, e::ERP) = sample(k,e,ctx)
+factor(k::Function, score) = factor(k,score,ctx)
 
-sample(e::ERP, k::Function, ::Prior) = k(sample(e))
+sample(k::Function, e::ERP, ::Prior) = k(sample(e))
 
 # @pp
-score(e::ERP, x, k::Function) = k(score(e,x))
+score(k::Function, e::ERP, x) = k(score(e,x))
 
-observe(erp::ERP, x, k::Function) = factor(score(erp,x), k)
-observes(erp::ERP, xs, k::Function) = factor(sum([score(erp,x) for x in xs]),k)
+observe(k::Function, erp::ERP, x) = factor(k, score(erp,x))
+observes(k::Function, erp::ERP, xs) = factor(k, sum([score(erp,x) for x in xs]))
 
 function normalize!{_}(dict::Dict{_,Float64})
     norm = sum(values(dict))
