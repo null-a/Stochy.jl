@@ -39,7 +39,7 @@ sample(k::Function, e::ERP, ::Prior) = k(sample(e))
 score(k::Function, e::ERP, x) = k(score(e,x))
 
 observe(k::Function, erp::ERP, x) = factor(k, score(erp,x))
-observes(k::Function, erp::ERP, xs) = factor(k, sum([score(erp,x) for x in xs]))
+observe(k::Function, erp::ERP, xs...) = factor(k, sum([score(erp,x) for x in xs]))
 
 function normalize!{_}(dict::Dict{_,Float64})
     norm = sum(values(dict))
