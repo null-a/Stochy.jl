@@ -244,6 +244,9 @@ function desugar(expr::Expr)
         # Add a top-level local expression to a block and recurse to
         # expand if required.
         desugar(Expr(:block, expr))
+    elseif expr.head == :call && expr.args[1] == :~
+        # Re-write calls to ~.
+        Expr(:call, :sample, map(desugar, expr.args[2:end])...)
     else
         Expr(expr.head, map(desugar, expr.args)...)
     end

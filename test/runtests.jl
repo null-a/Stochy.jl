@@ -215,4 +215,6 @@ end
 @test expr_eq(desugar(:(local x=1, y=2)),
                       :(begin; local x=1; local y=2 end)) 
 
+@test expr_eq(desugar(:(~nothing)), :(sample(nothing)))
+
 println("Passed!")
