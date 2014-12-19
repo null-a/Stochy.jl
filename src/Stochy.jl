@@ -4,8 +4,14 @@ using Base.Collections
 
 export @pp, sample, factor, score, observe, observes
 
+debugflag = false
+debug(b::Bool) = global debugflag = b
+debug() = debugflag
+
 macro pp(expr)
-    esc(cps(desugar(expr), :identity))
+    cpsexpr = cps(desugar(expr), :identity)
+    debug() && println(striplineinfo(cpsexpr))
+    esc(cpsexpr)
 end
 
 abstract Ctx

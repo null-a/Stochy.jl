@@ -1,4 +1,5 @@
 using Base.Meta
+export @cps
 
 const primatives = [:+,:*,:-,:/,
                     :println, :cons, :list, :tail, :cat,
@@ -7,10 +8,6 @@ const primatives = [:+,:*,:-,:/,
 const compops = [symbol("=="), :>, :<, :>=, :<=]
 
 Atom = Union(Number, Bool, Symbol, String, QuoteNode)
-
-debugflag = false
-debug(b::Bool) = global debugflag = b
-debug() = debugflag
 
 function cps(expr, cont)
     strippedexpr = striplineinfo(expr)
@@ -34,7 +31,7 @@ isfuncdef(expr) = false
 
 macro cps(expr)
     cpsexpr = cps(expr, :identity)
-    debug() && println(cpsexpr)
+    debug() && println(striplineinfo(cpsexpr))
     esc(cpsexpr)
 end
 
@@ -42,27 +39,21 @@ end
 immutable Thunk
     f::Function
     function Thunk(f)
-        debug() && @assert arity(f) == 0
+        @assert arity(f) == 0
         new(f)
     end
 end
 
 function trampoline(t::Thunk)
-    maxstackdepth = 0
-    numthunks = 0
+    thunkcount = 0
     while isa(t, Thunk)
         t = t.f()
         if debug()
-            numthunks += 1
-            # This is /really/ slow.
-            stackdepth = length(backtrace())
-            stackdepth > maxstackdepth && (maxstackdepth = stackdepth)
+            #println(t.f.code)
+            thunkcount += 1
         end
     end
-    if debug()
-        println("max stack depth: ", maxstackdepth)
-        println("trampolined thunks: ", numthunks)
-    end
+    debug() && println("trampolined thunks: ", thunkcount)
     t
 end
 
