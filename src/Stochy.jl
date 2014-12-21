@@ -2,7 +2,7 @@ module Stochy
 
 using Base.Collections
 
-export @pp, sample, factor, score, observe
+export @pp, sample, factor, score, observe, mem
 
 debugflag = false
 debug(b::Bool) = global debugflag = b
@@ -55,6 +55,20 @@ function normalize{K,V<:Number}(dict::Dict{K,V})
         ret[k] = dict[k]/norm
     end
     ret
+end
+
+function mem(f::Function)
+    cache = Dict()
+    (k::Function,args...) -> begin
+        if haskey(cache, args)
+            k(cache[args])
+        else
+            f(args...) do val
+                cache[args] = val
+                k(val)
+            end
+        end
+    end
 end
 
 import Base.==, Base.hash, Base.first

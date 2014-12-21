@@ -2,7 +2,7 @@ using Base.Meta
 export @cps
 
 const primatives = [:+,:*,:-,:/,
-                    :println, :cons, :list, :tail, :cat,
+                    :mem, :println, :cons, :list, :tail, :cat,
                     :reverse, :.., :first, :second, :third, :fourth]
 
 const compops = [symbol("=="), :>, :<, :>=, :<=]
