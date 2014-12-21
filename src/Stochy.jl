@@ -2,7 +2,7 @@ module Stochy
 
 using Base.Collections
 
-export @pp, sample, factor, score, observe, observes
+export @pp, sample, factor, score, observe
 
 debugflag = false
 debug(b::Bool) = global debugflag = b
