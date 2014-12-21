@@ -93,6 +93,10 @@ n = Normal(0,1)
 s = sample(n)
 @test 0 < exp(score(n,s)) < 1
 
+# Beta.
+b = Beta(1,1)
+@test 0 <= sample(b) <= 1
+@test score(b,0.5) == 1.0
 
 # CPS
 

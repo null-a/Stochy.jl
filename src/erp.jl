@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, Dirichlet, flip, randominteger, uniform, normal, dirichlet, categorical, hellingerdistance
+export Bernoulli, Categorical, Normal, Dirichlet, Beta, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
@@ -162,6 +162,31 @@ score(erp::Dirichlet, x) = error("not implemented")
 dirichlet(k::Function, alpha) = sample(k, Dirichlet(alpha))
 dirichlet(k::Function, alpha, K) = sample(k, Dirichlet(alpha,K))
 
+
+immutable Beta <: ERP
+    alpha::Float64
+    beta::Float64
+    function Beta(alpha,beta)
+        @assert alpha > 0.
+        @assert beta > 0.
+        new (alpha,beta)
+    end
+end
+
+# @pp
+Beta(k::Function,alpha,beta) = k(Beta(alpha,beta))
+
+function sample(erp::Beta)
+    x = randgamma(erp.alpha, 1.)
+    y = randgamma(erp.beta, 1.)
+    x / (x+y)
+end
+
+score(erp::Beta, x) = (erp.alpha-1.)*log(x) + (erp.beta-1.)*log(1.-x) - lbeta(erp.alpha,erp.beta)
+support(erp::Beta) = error("not implemented")
+
+# @pp
+samplebeta(k::Function, alpha, beta) = sample(k, Beta(alpha, beta))
 
 hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")
 
