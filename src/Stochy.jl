@@ -58,9 +58,9 @@ function normalize{K,V<:Number}(dict::Dict{K,V})
 end
 
 import Base.==, Base.hash, Base.first
-export .., first, second, third, fourth
+export .., first, second, third, fourth, repeat
 
-using DataStructures: Cons, Nil, head, tail, cons
+using DataStructures: Cons, Nil, head, tail, cons, list
 
 const .. = cons
 
@@ -75,5 +75,11 @@ first(l::Cons)  = head(l)
 second(l::Cons) = head(tail(l))
 third(l::Cons)  = head(tail(tail(l)))
 fourth(l::Cons) = head(tail(tail(tail(l))))
+
+# TODO: Change the base case to n==1 so that the created list is
+# tightly typed. Throw error for n<1.
+@pp function repeat(f::Function, n::Int64)
+    n < 1 ? list() : cons(f(), repeat(f, n-1))
+end
 
 end
