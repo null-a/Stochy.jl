@@ -96,7 +96,7 @@ s = sample(n)
 # Beta.
 b = Beta(1,1)
 @test 0 <= sample(b) <= 1
-@test score(b,0.5) == 1.0
+@test score(b,0.5) == 0.
 
 # CPS
 
