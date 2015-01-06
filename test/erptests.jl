@@ -35,7 +35,7 @@ c = Categorical([0.4,0.6], [:a,:b])
 d = Dirichlet(1.,2)
 s = sample(d)
 @test length(s) == 2
-@test sum(s) == 1
+@test_approx_eq sum(s) 1
 
 # Normal.
 n = Normal(0,1)
