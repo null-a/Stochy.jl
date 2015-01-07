@@ -19,6 +19,7 @@ type Prior <: Ctx end
 ctx = Prior()
 
 include("cps.jl")
+include("cc.jl")
 include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")

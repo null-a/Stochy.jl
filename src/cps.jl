@@ -37,9 +37,11 @@ end
 
 # Distinguish thunks from functions returns by the transformed code.
 immutable Thunk
-    f::Function
+    # TODO: Add type back here taking account of cc.
+    f#::Function
     function Thunk(f)
-        @assert arity(f) == 0
+        # TODO: Re-enable this.
+        #@assert arity(f) == 0
         new(f)
     end
 end
@@ -47,7 +49,7 @@ end
 function trampoline(t::Thunk)
     thunkcount = 0
     while isa(t, Thunk)
-        t = t.f()
+        t = call(t.f)
         if debug()
             #println(t.f.code)
             thunkcount += 1
