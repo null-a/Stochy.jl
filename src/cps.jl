@@ -49,7 +49,7 @@ end
 function trampoline(t::Thunk)
     thunkcount = 0
     while isa(t, Thunk)
-        t = call(t.f)
+        t = t.f()
         if debug()
             #println(t.f.code)
             thunkcount += 1

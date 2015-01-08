@@ -16,8 +16,8 @@ expr = quote
     end
 end
 
-newexpr = cc(expr)
-@test call(call(eval(newexpr), ()->Base), :x) == :x
+#newexpr = cc(expr)
+#@test call(call(eval(newexpr), ()->Base), :x) == :x
 
 # Matt Might's test case.
 
@@ -33,10 +33,15 @@ end
 
 a = :a
 newexpr = cc(expr)
-#println(newexpr)
+println(newexpr)
+println()
+Meta.show_sexpr(newexpr)
+println()
 result = call(call(call(eval(newexpr), (args...)->args), :b), :c)
-#println(result)
+println(result)
 @test result == (:a,:b,:c)
+
+error("HALT!!")
 
 # Argument shadowing global.
 
