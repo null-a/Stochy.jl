@@ -33,17 +33,17 @@ type Enum <: Ctx
 end
 
 # @pp
-function sample(k::Function, e::ERP, ctx::Enum)
+function sample(s::Store, k::Function, e::ERP, ctx::Enum)
     for val in support(e)
-        enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(val), [ctx.path, val]))
+        enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(s,val), [ctx.path, val]))
     end
     runnext()
 end
 
 # @pp
-function factor(k::Function, score, ctx::Enum)
+function factor(s::Store, k::Function, score, ctx::Enum)
     ctx.score += score
-    k(nothing)
+    k(s, nothing)
 end
 
 function runnext()
@@ -54,20 +54,20 @@ function runnext()
 end
 
 # @pp
-enum(k::Function, comp::Function) = enumbreadthfirst(k, comp)
+enum(s::Store, k::Function, comp::Function) = enumbreadthfirst(s, k, comp)
 
-enumdepthfirst(k::Function, comp::Function) = enum(k, comp, Stack)
-enumbreadthfirst(k::Function, comp::Function) = enum(k, comp, Queue)
-enumlikelyfirst(k::Function, comp::Function) = enum(k, comp, PriorityQueue)
+enumdepthfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, Stack)
+enumbreadthfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, Queue)
+enumlikelyfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, PriorityQueue)
 
-function enum(k::Function, comp::Function, queuetype::DataType)
+function enum(store::Store, k::Function, comp::Function, queuetype::DataType)
     global ctx
     returns = Dict{Any,Float64}()
     ctxold, ctx = ctx, Enum(queuetype)
     try
         currentexec = 0
         trampoline() do
-            comp() do value
+            partial(comp,store)() do _store, value
                 currentexec += 1
                 returns[value] = get(returns, value, 0) + exp(ctx.score)
                 if currentexec >= 1000
@@ -82,5 +82,5 @@ function enum(k::Function, comp::Function, queuetype::DataType)
         ctx = ctxold
     end
     # Note: The context must be restored before calling k.
-    k(Categorical(returns))
+    k(store, Categorical(returns))
 end

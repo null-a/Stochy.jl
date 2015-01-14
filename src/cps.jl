@@ -1,10 +1,6 @@
 using Base.Meta
 export @cps
 
-const primatives = [:+,:*,:-,:/,
-                    :tuple, :mem, :println, :cons, :list, :tail, :cat,
-                    :reverse, :.., :first, :second, :third, :fourth]
-
 const compops = [symbol("=="), :>, :<, :>=, :<=]
 
 Atom = Union(Number, Bool, Symbol, String, QuoteNode)
@@ -147,8 +143,10 @@ function tc(expr, cont)
             :($cont($(e).$(sym)))
         end
     elseif expr.head == :comparison && expr.args[2] in compops
+        @assert length(expr.args) == 3
         tk([expr.args[1], expr.args[3]]) do x, y
-            :($cont($(expr.args[2])($x,$y)))
+            compexpr = Expr(expr.head, x, expr.args[2], y)
+            :($cont($compexpr))
         end
     elseif expr.head == :vcat
         tk(expr.args) do e...
@@ -208,7 +206,10 @@ function m(expr::Expr)
     if expr.head == :->
         k = symbol("##k00")
         args = procargs(expr.args[1])
-        body = expr.args[2]
+        # This type annotation is required to fix a failing test
+        # caused by this issue:
+        # https://github.com/JuliaLang/julia/issues/9770
+        body = expr.args[2]::Expr
         :(($k, $(args...)) -> $(tc(body, k)))
     elseif expr.head == :quote
         expr

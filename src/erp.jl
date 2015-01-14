@@ -22,7 +22,7 @@ immutable Bernoulli <: ERP
 end
 
 # @pp
-Bernoulli(k::Function, p::Float64) = k(Bernoulli(p))
+Bernoulli(s::Store, k::Function, p::Float64) = k(s, Bernoulli(p))
 
 sample(erp::Bernoulli) = rand() < erp.p
 support(::Bernoulli) = (true,false)
@@ -55,10 +55,10 @@ Categorical(ps,xs) = Categorical(ps,xs,Dict(xs,ps))
 Categorical(d::Dict) = Categorical(collect(values(d)), collect(keys(d)), d)
 
 # @pp
-Categorical(k::Function,ps) = k(Categorical(ps))
-Categorical(k::Function,ps,xs) = k(Categorical(ps,xs))
-categorical(k::Function,ps) = sample(k, Categorical(ps))
-categorical(k::Function,ps,xs) = sample(k, Categorical(ps,xs))
+Categorical(s::Store,k::Function,ps) = k(s,Categorical(ps))
+Categorical(s::Store,k::Function,ps,xs) = k(s,Categorical(ps,xs))
+categorical(s::Store,k::Function,ps) = sample(s,k,Categorical(ps))
+categorical(s::Store,k::Function,ps,xs) = sample(s,k,Categorical(ps,xs))
 
 sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
@@ -67,8 +67,8 @@ support(erp::Categorical) = erp.xs
 show(io::IO, erp::Categorical) = showfield(io, erp, :map)
 
 # @pp
-function randominteger(k::Function, n)
-    sample(k, Categorical(fill(1/n,n)))
+function randominteger(s::Store, k::Function, n)
+    sample(s, k, Categorical(fill(1/n,n)))
 end
 
 immutable Empirical <: ERP
@@ -94,13 +94,13 @@ end
 # execution of a program which calls the thunk n times.
 
 # @pp
-function Empirical(k::Function, comp::Function, n)
-    repeat(comp, n) do samples
+function Empirical(s::Store, k::Function, comp::Function, n)
+    partial(repeat, s)(comp, n) do store::Store, samples
         counts = Dict{Any,Int64}()
         for s in samples
             counts[s] = get(counts,s,0) + 1
         end
-        k(Empirical(counts))
+        k(store, Empirical(counts))
     end
 end
 
@@ -138,7 +138,7 @@ sample(::StandardUniform) = rand()
 score(::StandardUniform, _) = 0.0
 
 # @pp
-uniform(k) = sample(k, StandardUniform())
+uniform(s::Store,k::Function) = sample(s, k, StandardUniform())
 
 
 immutable Normal <: ERP
@@ -151,13 +151,13 @@ immutable Normal <: ERP
 end
 
 # @pp
-Normal(k,mean,var) = k(Normal(mean,var))
+Normal(s::Store,k::Function,mean,var) = k(s,Normal(mean,var))
 
 sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
 score(erp::Normal, x) = -0.5*(((x-erp.mean)^2 / erp.var) + log(2π*erp.var))
 
 # @pp
-normal(k, mean, var) = sample(k, Normal(mean, var))
+normal(s::Store, k::Function, mean, var) = sample(s, k, Normal(mean, var))
 
 
 immutable Dirichlet <: ERP
@@ -176,8 +176,8 @@ sample(erp::Dirichlet) = randdirichlet(erp.alpha)
 score(erp::Dirichlet, x) = sum(((erp.alpha-1.0) .* log(x)) - lgamma(erp.alpha)) + lgamma(sum(erp.alpha))
 
 # @pp
-dirichlet(k::Function, alpha) = sample(k, Dirichlet(alpha))
-dirichlet(k::Function, alpha, K) = sample(k, Dirichlet(alpha,K))
+dirichlet(s::Store, k::Function, alpha) = sample(s, k, Dirichlet(alpha))
+dirichlet(s::Store, k::Function, alpha, K) = sample(s, k, Dirichlet(alpha,K))
 
 
 immutable Beta <: ERP
@@ -191,7 +191,7 @@ immutable Beta <: ERP
 end
 
 # @pp
-Beta(k::Function,alpha,beta) = k(Beta(alpha,beta))
+Beta(s::Store,k::Function,alpha,beta) = k(s,Beta(alpha,beta))
 
 function sample(erp::Beta)
     x = randgamma(erp.alpha, 1.)
@@ -203,7 +203,7 @@ score(erp::Beta, x) = (erp.alpha-1.)*log(x) + (erp.beta-1.)*log(1.-x) - lbeta(er
 support(erp::Beta) = error("not implemented")
 
 # @pp
-samplebeta(k::Function, alpha, beta) = sample(k, Beta(alpha, beta))
+samplebeta(s::Store, k::Function, alpha, beta) = sample(s, k, Beta(alpha, beta))
 
 immutable Gamma <: ERP
     a::Float64 # Shape.
@@ -216,14 +216,14 @@ immutable Gamma <: ERP
 end
 
 # @pp
-Gamma(k::Function,a,b) = k(Gamma(a,b))
+Gamma(s::Store,k::Function,a,b) = k(s,Gamma(a,b))
 
 sample(erp::Gamma) = randgamma(erp.a, 1./erp.b)
 score(erp::Gamma, x) = erp.a*log(erp.b) + (erp.a-1)*log(x) - erp.b*x - lgamma(erp.a)
 support(erp::Gamma) = error("not implemented")
 
 # @pp
-samplegamma(k::Function,a,b) = sample(k,Gamma(a,b))
+samplegamma(s::Store,k::Function,a,b) = sample(s,k,Gamma(a,b))
 
 hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")
 

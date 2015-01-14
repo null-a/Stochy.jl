@@ -29,12 +29,12 @@ function resetparticles!(ctx::PMCMC)
     ctx.particles = [Particle(ctx.thunk) for _ in 1:ctx.numparticles]
 end
 
-function sample(k::Function, e::ERP, ::PMCMC)
-    k(sample(e))
+function sample(s::Store, k::Function, e::ERP, ::PMCMC)
+    k(s,sample(e))
 end
 
-function factor(k::Function, score, ctx::PMCMC)
-    push!(ctx.particles[ctx.currentindex].path, Step(()->k(nothing), score))
+function factor(s::Store, k::Function, score, ctx::PMCMC)
+    push!(ctx.particles[ctx.currentindex].path, Step(()->k(s,nothing), score))
     if ctx.currentindex < length(ctx.particles)
         ctx.currentindex += 1
     else
@@ -65,7 +65,7 @@ function resample(particles, retainedparticle::Particle)
     resample(allparticles, weights, length(particles))
 end
 
-function pmcmcexit(value)
+function pmcmcexit(store::Store, value)
     ctx.particles[ctx.currentindex].value = value
     if ctx.currentindex < length(ctx.particles)
         ctx.currentindex += 1
@@ -75,10 +75,10 @@ function pmcmcexit(value)
     end
 end
 
-function pmcmc(k::Function, comp::Function, numiterations, numparticles)
+function pmcmc(store::Store, k::Function, comp::Function, numiterations, numparticles)
     global ctx
     counts = Dict{Any,Int64}()
-    ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(pmcmcexit))
+    ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(store,pmcmcexit))
     try
         for i in 1:numiterations
             # Check some invariants.
@@ -95,7 +95,7 @@ function pmcmc(k::Function, comp::Function, numiterations, numparticles)
     finally
         ctx = ctxold
     end
-    k(Empirical(counts))
+    k(store, Empirical(counts))
 end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first

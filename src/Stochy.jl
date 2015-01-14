@@ -4,14 +4,20 @@ using Base.Collections
 
 export @pp, sample, factor, score, observe, mem
 
+const primatives = [:+,:*,:-,:/,
+                    :tuple, :mem, :println, :cons, :list, :tail, :cat,
+                    :reverse, :.., :first, :second, :third, :fourth]
+
 debugflag = false
 debug(b::Bool) = global debugflag = b
 debug() = debugflag
 
+partial(f,arg) = (args...) -> f(arg,args...)
+
 macro pp(expr)
-    cpsexpr = cps(desugar(expr), :identity)
-    debug() && println(striplineinfo(cpsexpr))
-    esc(cpsexpr)
+    tx = storetransform(cps(desugar(expr), :(Stochy.store_exit)))
+    debug() && println(striplineinfo(tx))
+    esc(tx)
 end
 
 abstract Ctx
@@ -19,6 +25,7 @@ type Prior <: Ctx end
 ctx = Prior()
 
 include("cps.jl")
+include("store.jl")
 include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")
@@ -30,16 +37,33 @@ else
 end
 
 # Dispatch based on current context.
-sample(k::Function, e::ERP) = sample(k,e,ctx)
-factor(k::Function, score) = factor(k,score,ctx)
+sample(s::Store, k::Function, e::ERP) = sample(s,k,e,ctx)
+factor(s::Store, k::Function, score) = factor(s,k,score,ctx)
 
-sample(k::Function, e::ERP, ::Prior) = k(sample(e))
+sample(s::Store, k::Function, e::ERP, ::Prior) = k(s,sample(e))
 
 # @pp
-score(k::Function, e::ERP, x) = k(score(e,x))
+score(s::Store, k::Function, e::ERP, x) = k(s,score(e,x))
 
-observe(k::Function, erp::ERP, x) = factor(k, score(erp,x))
-observe(k::Function, erp::ERP, xs...) = factor(k, sum([score(erp,x) for x in xs]))
+observe(s::Store, k::Function, erp::ERP, x) = factor(s, k, score(erp,x))
+observe(s::Store, k::Function, erp::ERP, xs...) = factor(s, k, sum([score(erp,x) for x in xs]))
+
+# @pp
+function mem(f::Function)
+    key = gensym()
+    (store::Store, k::Function, args...) -> begin
+        cachekey = (key,args)
+        if haskey(store,cachekey)
+            k(store,store[cachekey])
+        else
+            partial(f,store)(args...) do s,val
+                s = copy(s)
+                s[cachekey] = val
+                k(s,val)
+            end
+        end
+    end
+end
 
 function normalize!{_}(dict::Dict{_,Float64})
     norm = sum(values(dict))
@@ -55,20 +79,6 @@ function normalize{K,V<:Number}(dict::Dict{K,V})
         ret[k] = dict[k]/norm
     end
     ret
-end
-
-function mem(f::Function)
-    cache = Dict()
-    (k::Function,args...) -> begin
-        if haskey(cache, args)
-            k(cache[args])
-        else
-            f(args...) do val
-                cache[args] = val
-                k(val)
-            end
-        end
-    end
 end
 
 import Base.==, Base.hash, Base.first
