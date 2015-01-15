@@ -11,7 +11,7 @@ id(x) = x
 @test (@cps true) == true
 @test (@cps "test") == "test"
 @test (@cps :test) == :test
-@test eval(cps(:(:test), identity)) == :test
+@test eval(cps(:(:test), :identity)) == :test
 @test (@cps (()->false)()) == false
 @test (@cps (x->x)(false)) == false
 @test (@cps ((x,y)->x+y)(1, 2)) == 3
