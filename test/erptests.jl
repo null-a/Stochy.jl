@@ -47,6 +47,13 @@ b = Beta(1,1)
 @test 0 <= sample(b) <= 1
 @test score(b,0.5) == 0.
 
+# Gamma.
+g = Gamma(1,1)
+@test score(g,1) == -1
+g = Gamma(1,0.5)
+@test sample(g) > 0
+@test score(g,2) == log(0.5)-1
+
 # Hellinger distance.
 p = Categorical([0=>0.25,1=>0.25,2=>0.5])
 q = Empirical([0=>2,2=>3])

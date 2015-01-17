@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, Dirichlet, Beta, Empirical, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
+export Bernoulli, Categorical, Normal, Dirichlet, Beta, Gamma, Empirical, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
@@ -206,6 +206,26 @@ support(erp::Beta) = error("not implemented")
 
 # @pp
 samplebeta(k::Function, alpha, beta) = sample(k, Beta(alpha, beta))
+
+immutable Gamma <: ERP
+    a::Float64 # Shape.
+    b::Float64 # Rate.
+    function Gamma(a,b)
+        @assert a > 0.
+        @assert b > 0.
+        new(a,b)
+    end
+end
+
+# @pp
+Gamma(k::Function,a,b) = k(Gamma(a,b))
+
+sample(erp::Gamma) = randgamma(erp.a, 1./erp.b)
+score(erp::Gamma, x) = erp.a*log(erp.b) + (erp.a-1)*log(x) - erp.b*x - lgamma(erp.a)
+support(erp::Gamma) = error("not implemented")
+
+# @pp
+samplegamma(k::Function,a,b) = sample(k,Gamma(a,b))
 
 hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")
 
