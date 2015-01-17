@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, Dirichlet, Beta, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
+export Bernoulli, Categorical, Normal, Dirichlet, Beta, Empirical, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
@@ -76,12 +76,31 @@ immutable Empirical <: ERP
     xs::Vector
     ps::Vector{Float64}
     n::Int64
-    function Empirical(counts)
-        xs = collect(keys(counts))
-        ps = collect(values(counts))
-        n = sum(ps)
-        ps /= n
-        new(counts, xs, ps, n)
+end
+
+function Empirical(counts::Dict)
+    xs = collect(keys(counts))
+    ps = collect(values(counts))
+    n = sum(ps)
+    ps /= n
+    Empirical(counts, xs, ps, n)
+end
+
+# This is experimental and maybe removed. It repeatedly calls a thunk
+# and wraps the result in an ERP. This seems convinient as existing
+# function can be used to plot the results. This has different
+# semantics to pmcmc(1,n,thunk) which simulates n executions of the
+# program in which thunk is called once, rather than been a single
+# execution of a program which calls the thunk n times.
+
+# @pp
+function Empirical(k::Function, comp::Function, n)
+    repeat(comp, n) do samples
+        counts = Dict{Any,Int64}()
+        for s in samples
+            counts[s] = get(counts,s,0) + 1
+        end
+        k(Empirical(counts))
     end
 end
 
