@@ -188,7 +188,7 @@ immutable Beta <: ERP
     function Beta(alpha,beta)
         @assert alpha > 0.
         @assert beta > 0.
-        new (alpha,beta)
+        new(alpha,beta)
     end
 end
 
