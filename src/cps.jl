@@ -2,7 +2,7 @@ using Base.Meta
 export @cps
 
 const primatives = [:+,:*,:-,:/,
-                    :mem, :println, :cons, :list, :tail, :cat,
+                    :tuple, :mem, :println, :cons, :list, :tail, :cat,
                     :reverse, :.., :first, :second, :third, :fourth]
 
 const compops = [symbol("=="), :>, :<, :>=, :<=]
@@ -181,6 +181,10 @@ function tk(k::Function, expr::Union(Expr, Atom))
     elseif expr.head == :local
         v = expr.args[1].args[1]
         tc(expr, :($v -> $(k(v))))
+    elseif expr.head == :...
+        v = gensym()
+        vsplat = Expr(:..., v)
+        tc(expr.args[1], :($v -> $(k(vsplat))))
     else
         v = gensym()
         tc(expr, :($v -> Stochy.Thunk(() -> $(k(v)))))

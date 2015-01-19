@@ -93,6 +93,9 @@ let
     @test (@cps fact(5)) == 120
 end
 
+# Ellipsis
+@test (@cps tuple([1,2]...)) == (1,2)
+
 # Desugar
 expr_eq(e,f) = striplineinfo(e) == striplineinfo(f)
 
