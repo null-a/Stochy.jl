@@ -30,6 +30,7 @@ include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")
 include("pmcmc.jl")
+include("dp.jl")
 if isdefined(Main, :Gadfly)
     include("plot.jl")
 else
