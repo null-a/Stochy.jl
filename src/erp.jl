@@ -154,8 +154,7 @@ end
 Normal(k,mean,var) = k(Normal(mean,var))
 
 sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
-# Un-normalized score.
-score(erp::Normal, x) = (x-erp.mean)^2 / (-2. * erp.var)
+score(erp::Normal, x) = -0.5*(((x-erp.mean)^2 / erp.var) + log(2π*erp.var))
 
 # @pp
 normal(k, mean, var) = sample(k, Normal(mean, var))
@@ -174,8 +173,7 @@ end
 Dirichlet(alpha::Float64,K::Int64) = Dirichlet(fill(alpha,K))
 
 sample(erp::Dirichlet) = randdirichlet(erp.alpha)
-# Un-normalized score.
-score(erp::Dirichlet, x) = error("not implemented")
+score(erp::Dirichlet, x) = sum(((erp.alpha-1.0) .* log(x)) - lgamma(erp.alpha)) + lgamma(sum(erp.alpha))
 
 # @pp
 dirichlet(k::Function, alpha) = sample(k, Dirichlet(alpha))

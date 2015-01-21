@@ -36,6 +36,7 @@ d = Dirichlet(1.,2)
 s = sample(d)
 @test length(s) == 2
 @test_approx_eq sum(s) 1
+@test score(d,s) == 0.
 
 # Normal.
 n = Normal(0,1)
