@@ -32,6 +32,7 @@ include("enumerate.jl")
 include("pmcmc.jl")
 include("dp.jl")
 include("plotting/gadfly.jl")
+include("plotting/pyplot.jl")
 
 # Dispatch based on current context.
 sample(s::Store, k::Function, e::ERP) = sample(s,k,e,ctx)
