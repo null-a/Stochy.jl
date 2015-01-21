@@ -31,11 +31,7 @@ include("rand.jl")
 include("enumerate.jl")
 include("pmcmc.jl")
 include("dp.jl")
-if isdefined(Main, :Gadfly)
-    include("plot.jl")
-else
-    info("Load Gadfly before Stochy to extend plot function.")
-end
+include("plotting/gadfly.jl")
 
 # Dispatch based on current context.
 sample(s::Store, k::Function, e::ERP) = sample(s,k,e,ctx)
