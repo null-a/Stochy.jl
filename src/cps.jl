@@ -35,7 +35,6 @@ end
 immutable Thunk
     f::Function
     function Thunk(f)
-        @assert arity(f) == 0
         new(f)
     end
 end
@@ -56,11 +55,6 @@ end
 # Convenience function used to kick-off trampolining in enum() &
 # pmcmc().
 trampoline(f::Function) = trampoline(Thunk(f))
-
-function arity(f::Function)
-    isgeneric(f) && error("not implemented for generic functions")
-    length(Base.uncompressed_ast(f.code).args[1])
-end
 
 # CPS transform based on:
 # http://matt.might.net/articles/cps-conversion/
