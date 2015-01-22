@@ -20,7 +20,7 @@ id(x) = x
 @test (@cps cpsid(0)) == 0
 @test (@cps ((a...)->a)(1,2)) == (1,2)
 
-# Primatives
+# Primitives
 @test (@cps 1+1) == 2
 @test (@cps x+1) == 1
 

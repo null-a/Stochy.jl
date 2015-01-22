@@ -17,7 +17,7 @@ import Stochy: pass_store
 @test expr_eq(pass_store(:(f()()), :x), :(f(x)(x)))
 
 # Don't pass store to primitives, thunk constructor or trampoline.
-@assert :+ in Stochy.primatives
+@assert :+ in Stochy.primitives
 @test expr_eq(pass_store(:(1+2), :x), :(1+2))
 
 expr = :(Stochy.trampoline(Stochy.Thunk(()->false)))

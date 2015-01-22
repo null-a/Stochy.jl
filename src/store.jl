@@ -31,7 +31,7 @@ function pass_store(expr::Expr, arg::Symbol)
         @assert length(expr.args) == 2
         @assert length(expr.args[2].args) == 2
         Expr(:call, expr.args[1], Expr(:->, expr.args[2].args[1], p(expr.args[2].args[2])))
-    elseif expr.head == :call && !((expr.args[1] in primatives) || (expr.args[1] == :(Stochy.trampoline)))
+    elseif expr.head == :call && !((expr.args[1] in primitives) || (expr.args[1] == :(Stochy.trampoline)))
         func = expr.args[1]
         args = expr.args[2:end]
         Expr(:call, p(func), [arg, [p(a) for a in args]]...)

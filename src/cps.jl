@@ -221,7 +221,7 @@ isatomic(exp::Atom) = true
 isatomic(exp::Expr) = exp.head == :-> || exp.head == :quote
 isatomic(exp) = false
 
-isprimop(exp::Expr) = exp.head == :call && exp.args[1] in primatives
+isprimop(exp::Expr) = exp.head == :call && exp.args[1] in primitives
 
 isline(exp::Expr) = exp.head == :line
 isline(exp::LineNumberNode) = true

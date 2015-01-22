@@ -4,7 +4,7 @@ using Base.Collections
 
 export @pp, sample, factor, score, observe, mem
 
-const primatives = [:+,:*,:-,:/,
+const primitives = [:+,:*,:-,:/,
                     :tuple, :mem, :println, :cons, :list, :tail, :cat,
                     :reverse, :.., :first, :second, :third, :fourth]
 
