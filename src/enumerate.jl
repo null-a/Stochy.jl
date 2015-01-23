@@ -54,13 +54,13 @@ function runnext()
 end
 
 # @pp
-enum(s::Store, k::Function, comp::Function) = enumbreadthfirst(s, k, comp)
+enum(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enumbreadthfirst(s, k, comp, maximumexec)
 
-enumdepthfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, Stack)
-enumbreadthfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, Queue)
-enumlikelyfirst(s::Store, k::Function, comp::Function) = enum(s, k, comp, PriorityQueue)
+enumdepthfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, Stack, maximumexec)
+enumbreadthfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, Queue, maximumexec)
+enumlikelyfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, PriorityQueue, maximumexec)
 
-function enum(store::Store, k::Function, comp::Function, queuetype::DataType)
+function enum(store::Store, k::Function, comp::Function, queuetype::DataType, maximumexec::Int64=0)
     global ctx
     returns = Dict{Any,Float64}()
     ctxold, ctx = ctx, Enum(queuetype)
@@ -70,8 +70,8 @@ function enum(store::Store, k::Function, comp::Function, queuetype::DataType)
             partial(comp,store)() do _store, value
                 currentexec += 1
                 returns[value] = get(returns, value, 0) + exp(ctx.score)
-                if currentexec >= 1000
-                    println("maximum executions reached")
+                if maximumexec > 0 && currentexec == maximumexec
+                    info("Maximum executions reached.")
                 elseif !isempty(ctx.unexplored)
                     runnext()
                 end
