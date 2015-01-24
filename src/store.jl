@@ -3,7 +3,7 @@ typealias Store Dict{Any,Any}
 function storetransform(expr::Expr)
     storearg = symbol("##store")
     emptystoreexpr = :(Stochy.Store())
-    Expr(:block, Expr(:local, Expr(symbol("="), storearg, emptystoreexpr)), pass_store(expr, storearg))
+    Expr(:block, Expr(symbol("="), storearg, emptystoreexpr), pass_store(expr, storearg))
 end
 
 function store_exit(store, value)
