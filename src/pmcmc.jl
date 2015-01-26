@@ -100,4 +100,4 @@ end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first
 # iteration.
-smc(k::Function, comp::Function, n) = pmcmc(k,comp,1,n)
+smc(store::Store, k::Function, comp::Function, n) = pmcmc(store,k,comp,1,n)
