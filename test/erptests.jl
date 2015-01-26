@@ -18,6 +18,23 @@ for (x,c) in hist
     @test sum(samples .== x) == c
 end
 
+# Bernoulli.
+b = Bernoulli(0.6)
+@test sample(b) in [true,false]
+@test score(b,true) == log(0.6)
+@test score(b,false) == log(0.4)
+@test length(support(b)) == 2
+@test true in support(b)
+@test false in support(b)
+
+# Uniform.
+u = Uniform()
+@test 0 <= sample(u) <= 1
+@test score(u,0.5) == 1
+u2 = Uniform(-1,1)
+@test -1 <= sample(u2) <= 1
+@test score(u2,0) == 0.5
+
 # Categorical.
 c = Categorical([0.4,0.6])
 @test sample(c) in 1:2

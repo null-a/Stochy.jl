@@ -1,5 +1,5 @@
 import Base.show
-export Bernoulli, Categorical, Normal, Dirichlet, Beta, Gamma, Empirical, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
+export Bernoulli, Categorical, Normal, Dirichlet, Beta, Gamma, Empirical, Uniform, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
@@ -132,14 +132,23 @@ function recoversamples(erp::Empirical)
     ret
 end
 
-immutable StandardUniform <: ERP; end
+immutable Uniform <: ERP
+    a::Float64
+    b::Float64
+    function Uniform(a,b)
+        @assert a<b
+        new(a,b)
+    end
+end
 
-sample(::StandardUniform) = rand()
-score(::StandardUniform, _) = 0.0
+Uniform() = Uniform(0,1)
+
+sample(erp::Uniform) = (erp.b-erp.a)*rand() + erp.a
+score(erp::Uniform, _) = 1./(erp.b-erp.a)
 
 # @pp
-uniform(s::Store,k::Function) = sample(s, k, StandardUniform())
-
+Uniform(s::Store, k::Function) = k(s, Uniform())
+Uniform(s::Store, k::Function, a, b) = k(s, Uniform(a,b))
 
 immutable Normal <: ERP
     mean::Float64 # mu
