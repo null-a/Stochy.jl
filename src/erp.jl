@@ -181,12 +181,12 @@ end
 # Symmetric Dirichlet.
 Dirichlet(alpha::Float64,K::Int64) = Dirichlet(fill(alpha,K))
 
+# @pp
+Dirichlet(s::Store, k::Function, alpha::Vector{Float64}) = k(s, Dirichlet(alpha))
+Dirichlet(s::Store, k::Function, alpha::Float64, K::Int64) = k(s, Dirichlet(alpha, K))
+
 sample(erp::Dirichlet) = randdirichlet(erp.alpha)
 score(erp::Dirichlet, x) = sum(((erp.alpha-1.0) .* log(x)) - lgamma(erp.alpha)) + lgamma(sum(erp.alpha))
-
-# @pp
-dirichlet(s::Store, k::Function, alpha) = sample(s, k, Dirichlet(alpha))
-dirichlet(s::Store, k::Function, alpha, K) = sample(s, k, Dirichlet(alpha,K))
 
 
 immutable Beta <: ERP
