@@ -1,5 +1,7 @@
 import Base.show
-export Bernoulli, Categorical, Normal, Dirichlet, Beta, Gamma, Empirical, Uniform, flip, randominteger, uniform, normal, dirichlet, categorical, samplebeta, hellingerdistance
+
+export Bernoulli, Categorical, Normal, Dirichlet, Beta, Gamma, Empirical, Uniform
+export flip, randominteger, hellingerdistance
 
 isprob(x::Float64) = 0 <= x <= 1
 isdistribution(xs::Vector{Float64}) = all(isprob, xs) && abs(sum(xs)-1) < 1e-10
@@ -57,8 +59,6 @@ Categorical(d::Dict) = Categorical(collect(values(d)), collect(keys(d)), d)
 # @pp
 Categorical(s::Store,k::Function,ps) = k(s,Categorical(ps))
 Categorical(s::Store,k::Function,ps,xs) = k(s,Categorical(ps,xs))
-categorical(s::Store,k::Function,ps) = sample(s,k,Categorical(ps))
-categorical(s::Store,k::Function,ps,xs) = sample(s,k,Categorical(ps,xs))
 
 sample(erp::Categorical) = erp.xs[rand(erp.ps)]
 score(erp::Categorical, x) = log(erp.map[x])
@@ -165,9 +165,6 @@ Normal(s::Store,k::Function,mean,var) = k(s,Normal(mean,var))
 sample(erp::Normal) = randn() * sqrt(erp.var) + erp.mean
 score(erp::Normal, x) = -0.5*(((x-erp.mean)^2 / erp.var) + log(2π*erp.var))
 
-# @pp
-normal(s::Store, k::Function, mean, var) = sample(s, k, Normal(mean, var))
-
 
 immutable Dirichlet <: ERP
     alpha::Vector{Float64}
@@ -211,8 +208,6 @@ end
 score(erp::Beta, x) = (erp.alpha-1.)*log(x) + (erp.beta-1.)*log(1.-x) - lbeta(erp.alpha,erp.beta)
 support(erp::Beta) = error("not implemented")
 
-# @pp
-samplebeta(s::Store, k::Function, alpha, beta) = sample(s, k, Beta(alpha, beta))
 
 immutable Gamma <: ERP
     a::Float64 # Shape.
@@ -230,9 +225,6 @@ Gamma(s::Store,k::Function,a,b) = k(s,Gamma(a,b))
 sample(erp::Gamma) = randgamma(erp.a, 1./erp.b)
 score(erp::Gamma, x) = erp.a*log(erp.b) + (erp.a-1)*log(x) - erp.b*x - lgamma(erp.a)
 support(erp::Gamma) = error("not implemented")
-
-# @pp
-samplegamma(s::Store,k::Function,a,b) = sample(s,k,Gamma(a,b))
 
 hellingerdistance(p::Empirical,q::Empirical) = error("not implemented")
 
