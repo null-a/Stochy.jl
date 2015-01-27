@@ -1,8 +1,14 @@
 module Stochy
 
 using Base.Collections
+import Base: factor, show
+
+import Distributions
+import Distributions: Distribution, support, rand
+const score = Distributions.logpdf
 
 export @pp, sample, factor, score, observe, mem
+export Discrete, Dir, flip, randominteger, hellingerdistance
 
 const primitives = [:+,:*,:-,:/,
                     :tuple, :mem, :println, :cons, :list, :tail, :cat,
@@ -38,7 +44,7 @@ include("plotting/pyplot.jl")
 sample(s::Store, k::Function, e::ERP) = sample(s,k,e,ctx)
 factor(s::Store, k::Function, score) = factor(s,k,score,ctx)
 
-sample(s::Store, k::Function, e::ERP, ::Prior) = k(s,sample(e))
+sample(s::Store, k::Function, e::ERP, ::Prior) = k(s,rand(e))
 
 # @pp
 score(s::Store, k::Function, e::ERP, x) = k(s,score(e,x))
@@ -61,22 +67,6 @@ function mem(f::Function)
             end
         end
     end
-end
-
-function normalize!{_}(dict::Dict{_,Float64})
-    norm = sum(values(dict))
-    for k in keys(dict)
-        dict[k] /= norm
-    end
-end
-
-function normalize{K,V<:Number}(dict::Dict{K,V})
-    ret = Dict{K,Float64}()
-    norm = sum(values(dict))
-    for k in keys(dict)
-        ret[k] = dict[k]/norm
-    end
-    ret
 end
 
 import Base.==, Base.hash, Base.first

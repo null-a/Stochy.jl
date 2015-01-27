@@ -77,10 +77,9 @@ function enum(store::Store, k::Function, comp::Function, queuetype::DataType, ma
                 end
             end
         end
-        normalize!(returns)
     finally
         ctx = ctxold
     end
     # Note: The context must be restored before calling k.
-    k(store, Categorical(returns))
+    k(store, Discrete(returns))
 end

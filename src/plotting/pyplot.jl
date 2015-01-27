@@ -24,11 +24,13 @@ function bar(erp::ERP; kwargs...)
     ylabel("p(x)")
 end
 
-function histogram(erp::Empirical; kwargs...)
+function histogram(erp::ERP; kwargs...)
     @assert pyplotloaded()
     hist, figure, xlabel, ylabel = del(:hist, :figure, :xlabel, :ylabel)
     figure(figsize=(6,4))
-    hist(;x=erp.xs, weights=erp.ps, kwargs...)
+    xs = sort(collect(support(erp)))
+    ps = map(x->exp(score(erp,x)), xs)
+    hist(;x=xs, weights=ps, kwargs...)
     xlabel("x")
     ylabel("count")
 end

@@ -30,7 +30,7 @@ function resetparticles!(ctx::PMCMC)
 end
 
 function sample(s::Store, k::Function, e::ERP, ::PMCMC)
-    k(s,sample(e))
+    k(s,rand(e))
 end
 
 function factor(s::Store, k::Function, score, ctx::PMCMC)
@@ -95,7 +95,7 @@ function pmcmc(store::Store, k::Function, comp::Function, numiterations, numpart
     finally
         ctx = ctxold
     end
-    k(store, Empirical(counts))
+    k(store, Discrete(counts))
 end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first
