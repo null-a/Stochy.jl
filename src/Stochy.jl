@@ -10,7 +10,7 @@ const score = Distributions.logpdf
 export @pp, sample, factor, score, observe, mem
 export Discrete, Dir, flip, randominteger, hellingerdistance
 
-const primitives = [:+,:*,:-,:/,
+const primitives = [:+,:*,:-,:/,:sqrt,:√,
                     :tuple, :mem, :println, :cons, :list, :tail, :cat,
                     :reverse, :.., :first, :second, :third, :fourth]
 
