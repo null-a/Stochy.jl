@@ -15,6 +15,7 @@ Pkg.checkout("Stochy")
 ## Examples
 
 - [Introduction](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Introduction.ipynb)
+- [Bayes Net](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Bayes%20Net.ipynb)
 - [Marbles](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Marbles.ipynb)
 - [Dirichlet Process Mixture Model](http://nbviewer.ipython.org/github/null-a/StochyExamples/blob/master/Dirichlet%20Process%20Mixture%20Model.ipynb)
 
