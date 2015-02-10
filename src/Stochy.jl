@@ -69,7 +69,7 @@ function mem(f::Function)
     end
 end
 
-import Base.==, Base.hash, Base.first
+import Base.==, Base.hash, Base.first, Base.isless
 export .., first, second, third, fourth, repeat
 
 using DataStructures: Cons, Nil, head, tail, cons, list
@@ -82,6 +82,15 @@ const .. = cons
 ==(x::Nil,y::Nil) = true
 
 hash(x::Cons,h::Uint64) = hash(tail(x), hash(head(x), h))
+
+function isless(xs::Cons,ys::Cons)
+    x, y = head(xs), head(ys)
+    x==y ? isless(tail(xs), tail(ys)) : isless(x,y)
+end
+
+isless(xs::Nil,ys::Cons) = true
+isless(xs::Cons,ys::Nil) = false
+isless(xs::Nil,ys::Nil) = true
 
 first(l::Cons)  = head(l)
 second(l::Cons) = head(tail(l))
