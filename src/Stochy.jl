@@ -82,6 +82,7 @@ const .. = cons
 ==(x::Nil,y::Nil) = true
 
 hash(x::Cons,h::Uint64) = hash(tail(x), hash(head(x), h))
+hash(_::Nil,h::Uint64) = hash(object_id(list()), h)
 
 function isless(xs::Cons,ys::Cons)
     x, y = head(xs), head(ys)
