@@ -7,7 +7,7 @@ import Distributions
 import Distributions: Distribution, support, rand
 const score = Distributions.logpdf
 
-export @pp, sample, factor, score, observe, mem
+export @pp, sample, factor, score, observe, mem, cache
 export Discrete, Dir, flip, randominteger, hellingerdistance
 
 const primitives = [:!,:+,:*,:-,:/,:sqrt,:√,
@@ -52,6 +52,12 @@ score(s::Store, k::Function, e::ERP, x) = k(s,score(e,x))
 observe(s::Store, k::Function, erp::ERP, x) = factor(s, k, score(erp,x))
 observe(s::Store, k::Function, erp::ERP, xs...) = factor(s, k, sum([score(erp,x) for x in xs]))
 
+
+# cache and mem are similar. The primary difference is that mem uses a
+# cache local to the "thread", cache uses a global cache. Another
+# difference is that the cache used by mem is local to a @pp block,
+# whereas the cache shares its cache between @pp blocks.
+
 # @pp
 function mem(f::Function)
     key = gensym()
@@ -64,6 +70,23 @@ function mem(f::Function)
                 s = copy(s)
                 s[cachekey] = val
                 k(s,val)
+            end
+        end
+    end
+end
+
+const CACHE = Dict()
+
+# @pp
+function cache(s::Store, k::Function, f::Function)
+    partial(k,s)() do s2, k2, args...
+        # This is the body of the memoized function.
+        if haskey(CACHE, args)
+            k2(s2, CACHE[args])
+        else
+            partial(f,s2)(args...) do s3, value
+                CACHE[args] = value
+                k2(s3,value)
             end
         end
     end
