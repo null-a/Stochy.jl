@@ -14,6 +14,11 @@ end
 @test_approx_eq(exp(score(dist,2)), 0.445384113713482)
 @test_approx_eq(exp(score(dist,3)), 0.148461371237827)
 
+@test_throws ErrorException @pp enum() do
+    factor(-Inf)
+    true
+end
+
 # Ensure the context is restored when an exception occurs during
 # enumeration.
 try @pp enum(()->foo())

@@ -38,6 +38,7 @@ immutable Discrete
         x = collect(keys(dict))
         p = collect(values(dict))
         z = sum(p)
+        z == 0 && error("Distribution has zero probability mass.")
         z != 1.0 && (p /= z)
         new(x,p,dict,z)
     end
