@@ -49,6 +49,7 @@ support(erp::Discrete) = erp.x
 score(erp::Discrete, x) = log(erp.dict[x]/erp.z)
 
 # @pp
+Discrete(s::Store, k::Function, d::Dict) = k(s, Discrete(d))
 Discrete(s::Store, k::Function, x, p) = k(s, Discrete(Dict(x,p)))
 
 # This is experimental and maybe removed. It repeatedly calls a thunk

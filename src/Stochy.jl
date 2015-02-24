@@ -10,9 +10,10 @@ const score = Distributions.logpdf
 export @pp, sample, factor, score, observe, mem, cache
 export Discrete, Dir, flip, randominteger, hellingerdistance
 
-const primitives = [:!,:+,:*,:-,:/,:sqrt,:√,
-                    :tuple, :mem, :println, :cons, :list, :tail, :cat,
-                    :reverse, :.., :first, :second, :third, :fourth]
+const primitives = [:!,:+,:*,:-,:/,:sqrt,:√,:error,:exp,
+                    :tuple, :mem, :println, :cons, :list, :tail, :cat, :length,
+                    :reverse, :.., :first, :second, :third, :fourth,
+                    :get, :setindex!]
 
 debugflag = false
 debug(b::Bool) = global debugflag = b
@@ -32,9 +33,11 @@ ctx = Prior()
 
 include("cps.jl")
 include("store.jl")
+include("continuations.jl")
 include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")
+include("enumdelimited.jl")
 include("pmcmc.jl")
 include("dp.jl")
 include("plotting/gadfly.jl")
@@ -48,6 +51,8 @@ sample(s::Store, k::Function, e::ERP, ::Prior) = k(s,rand(e))
 
 # @pp
 score(s::Store, k::Function, e::ERP, x) = k(s,score(e,x))
+
+support(s::Store, k::Function, erp::ERP) = k(s, support(erp))
 
 observe(s::Store, k::Function, erp::ERP, x) = factor(s, k, score(erp,x))
 observe(s::Store, k::Function, erp::ERP, xs...) = factor(s, k, sum([score(erp,x) for x in xs]))
