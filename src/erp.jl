@@ -69,12 +69,23 @@ function Discrete(s::Store, k::Function, comp::Function, n)
     end
 end
 
+# Based on Base.showdict
 function show(io::IO, erp::Discrete)
-    print(io, "Discrete(")
-    show(io, erp.x)
-    print(io, ", ")
-    show(io, erp.p)
-    print(io, ")")
+    t = sort(collect(zip(erp.p, erp.x)), rev=true)
+
+    xs = Array(String, length(t))
+    keylen = 0
+    for (i, (_,x)) in enumerate(t)
+        xs[i] = sprint(show, x)
+        keylen = max(length(xs[i]), keylen)
+    end
+
+    for (i, (p,_)) in enumerate(t)
+        print(io, rpad(xs[i], keylen, " "))
+        print(io, " | ")
+        print(io, p)
+        i < length(t) && print(io, "\n")
+    end
 end
 
 const ERP = Union(Distribution, Discrete)
