@@ -29,11 +29,11 @@ function resetparticles!(ctx::PMCMC)
     ctx.particles = [Particle(ctx.thunk) for _ in 1:ctx.numparticles]
 end
 
-function sample(s::Store, k::Function, e::ERP, ::PMCMC)
+function sample(s::Store, k::Function, address, e::ERP, ::PMCMC)
     k(s,rand(e))
 end
 
-function factor(s::Store, k::Function, score, ctx::PMCMC)
+function factor(s::Store, k::Function, address, score, ctx::PMCMC)
     push!(ctx.particles[ctx.currentindex].path, Step(()->k(s,nothing), score))
     if ctx.currentindex < length(ctx.particles)
         ctx.currentindex += 1
@@ -75,10 +75,10 @@ function pmcmcexit(store::Store, value)
     end
 end
 
-function pmcmc(store::Store, k::Function, comp::Function, numiterations, numparticles)
+function pmcmc(store::Store, k::Function, address, comp::Function, numiterations, numparticles)
     global ctx
     counts = Dict{Any,Int64}()
-    ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(store,pmcmcexit))
+    ctxold, ctx = ctx, PMCMC(numparticles, ()->comp(store,pmcmcexit,address))
     try
         for i in 1:numiterations
             # Check some invariants.
@@ -100,4 +100,4 @@ end
 
 # PMCMC uses plain SMC (i.e. no retained particle) for the first
 # iteration.
-smc(store::Store, k::Function, comp::Function, n) = pmcmc(store,k,comp,1,n)
+smc(store::Store, k::Function, a, comp::Function, n) = pmcmc(store,k,a,comp,1,n)

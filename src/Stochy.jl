@@ -21,7 +21,7 @@ debug() = debugflag
 partial(f,arg) = (args...) -> f(arg,args...)
 
 macro pp(expr)
-    tx = storetransform(cps(desugar(expr), :(Stochy.store_exit)))
+    tx = storetransform(cps(addressing(desugar(expr)), :(Stochy.store_exit)))
     debug() && println(striplineinfo(tx))
     esc(tx)
 end
@@ -32,25 +32,27 @@ ctx = Prior()
 
 include("cps.jl")
 include("store.jl")
+include("addressing.jl")
 include("erp.jl")
 include("rand.jl")
 include("enumerate.jl")
+include("mh.jl")
 include("pmcmc.jl")
 include("dp.jl")
 include("plotting/gadfly.jl")
 include("plotting/pyplot.jl")
 
 # Dispatch based on current context.
-sample(s::Store, k::Function, e::ERP) = sample(s,k,e,ctx)
-factor(s::Store, k::Function, score) = factor(s,k,score,ctx)
+sample(s::Store, k::Function, a, e::ERP) = sample(s,k,a,e,ctx)
+factor(s::Store, k::Function, a, score) = factor(s,k,a,score,ctx)
 
-sample(s::Store, k::Function, e::ERP, ::Prior) = k(s,rand(e))
+sample(s::Store, k::Function, a, e::ERP, ::Prior) = k(s,rand(e))
 
 # @pp
-score(s::Store, k::Function, e::ERP, x) = k(s,score(e,x))
+score(s::Store, k::Function, a, e::ERP, x) = k(s,score(e,x))
 
-observe(s::Store, k::Function, erp::ERP, x) = factor(s, k, score(erp,x))
-observe(s::Store, k::Function, erp::ERP, xs...) = factor(s, k, sum([score(erp,x) for x in xs]))
+observe(s::Store, k::Function, a, erp::ERP, x) = factor(s, k, a, score(erp,x))
+observe(s::Store, k::Function, a, erp::ERP, xs...) = factor(s, k, a, sum([score(erp,x) for x in xs]))
 
 
 # cache and mem are similar. The primary difference is that mem uses a
@@ -61,12 +63,12 @@ observe(s::Store, k::Function, erp::ERP, xs...) = factor(s, k, sum([score(erp,x)
 # @pp
 function mem(f::Function)
     key = gensym()
-    (store::Store, k::Function, args...) -> begin
+    (store::Store, k::Function, address, args...) -> begin
         cachekey = (key,args)
         if haskey(store,cachekey)
             k(store,store[cachekey])
         else
-            partial(f,store)(args...) do s,val
+            partial(f,store)(address, args...) do s,val
                 s = copy(s)
                 s[cachekey] = val
                 k(s,val)
@@ -78,13 +80,13 @@ end
 const CACHE = Dict()
 
 # @pp
-function cache(s::Store, k::Function, f::Function)
-    partial(k,s)() do s2, k2, args...
+function cache(s::Store, k::Function, address, f::Function)
+    partial(k,s)() do s2, k2, a2, args...
         # This is the body of the memoized function.
         if haskey(CACHE, args)
             k2(s2, CACHE[args])
         else
-            partial(f,s2)(args...) do s3, value
+            partial(f,s2)(a2, args...) do s3, value
                 CACHE[args] = value
                 k2(s3,value)
             end
@@ -96,6 +98,7 @@ import Base.==, Base.hash, Base.first, Base.isless
 export .., first, second, third, fourth, repeat
 
 using DataStructures: Cons, Nil, head, tail, cons, list
+export cons, list
 
 const .. = cons
 

@@ -51,3 +51,23 @@ catch e
         rethrow(e)
     end
 end
+
+
+# MH.
+
+dist = @pp mh(5) do
+    local x = flip(0.5)
+    factor(x ? 0 : -1)
+    x
+end
+
+@test issubset(support(dist), [true, false])
+
+try @pp mh(()->foo(),1)
+catch e
+    if isa(e, UndefVarError)
+        @test Stochy.ctx == Stochy.Prior()
+    else
+        rethrow(e)
+    end
+end

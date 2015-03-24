@@ -50,7 +50,7 @@ end
 # keeping around.
 
 c = 0
-function count(store,k)
+function count(store,k,address)
     global c
     c += 1
     k(store,c)

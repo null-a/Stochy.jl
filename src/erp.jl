@@ -5,7 +5,7 @@ function import_distributions(t=Distribution, count=0)
         if isgeneric(obj)
             # Concrete.
             eval(parse("import Distributions: $name; export $name"))
-            eval(:($name(s::Store, k::Function, args...) = k(s, $name(args...))))
+            eval(:($name(s::Store, k::Function, address, args...) = k(s, $name(args...))))
             count += 1
         else
             # Abstract.
@@ -49,7 +49,7 @@ support(erp::Discrete) = erp.x
 score(erp::Discrete, x) = log(erp.dict[x]/erp.z)
 
 # @pp
-Discrete(s::Store, k::Function, x, p) = k(s, Discrete(Dict(x,p)))
+Discrete(s::Store, k::Function, address, x, p) = k(s, Discrete(Dict(x,p)))
 
 # This is experimental and maybe removed. It repeatedly calls a thunk
 # and wraps the result in an ERP. This seems convinient as existing
@@ -59,8 +59,8 @@ Discrete(s::Store, k::Function, x, p) = k(s, Discrete(Dict(x,p)))
 # execution of a program which calls the thunk n times.
 
 # @pp
-function Discrete(s::Store, k::Function, comp::Function, n)
-    partial(repeat, s)(comp, n) do store::Store, samples
+function Discrete(s::Store, k::Function, address, comp::Function, n)
+    partial(repeat, s)(address, comp, n) do store::Store, samples
         counts = Dict{Any,Int64}()
         for s in samples
             counts[s] = get(counts,s,0) + 1

@@ -33,7 +33,7 @@ type Enum <: Ctx
 end
 
 # @pp
-function sample(s::Store, k::Function, e::ERP, ctx::Enum)
+function sample(s::Store, k::Function, a, e::ERP, ctx::Enum)
     for val in support(e)
         enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(s,val), [ctx.path, val]))
     end
@@ -41,7 +41,7 @@ function sample(s::Store, k::Function, e::ERP, ctx::Enum)
 end
 
 # @pp
-function factor(s::Store, k::Function, score, ctx::Enum)
+function factor(s::Store, k::Function, a, score, ctx::Enum)
     ctx.score += score
     k(s, nothing)
 end
@@ -54,20 +54,20 @@ function runnext()
 end
 
 # @pp
-enum(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enumbreadthfirst(s, k, comp, maximumexec)
+enum(s::Store, k::Function, a, comp::Function, maximumexec::Int64=0) = enumbreadthfirst(s, k, a, comp, maximumexec)
 
-enumdepthfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, Stack, maximumexec)
-enumbreadthfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, Queue, maximumexec)
-enumlikelyfirst(s::Store, k::Function, comp::Function, maximumexec::Int64=0) = enum(s, k, comp, PriorityQueue, maximumexec)
+enumdepthfirst(s::Store, k::Function, a, comp::Function, maximumexec::Int64=0) = enum(s, k, a, comp, Stack, maximumexec)
+enumbreadthfirst(s::Store, k::Function, a, comp::Function, maximumexec::Int64=0) = enum(s, k, a, comp, Queue, maximumexec)
+enumlikelyfirst(s::Store, k::Function, a, comp::Function, maximumexec::Int64=0) = enum(s, k, a, comp, PriorityQueue, maximumexec)
 
-function enum(store::Store, k::Function, comp::Function, queuetype::DataType, maximumexec::Int64=0)
+function enum(store::Store, k::Function, address, comp::Function, queuetype::DataType, maximumexec::Int64=0)
     global ctx
     returns = Dict{Any,Float64}()
     ctxold, ctx = ctx, Enum(queuetype)
     try
         currentexec = 0
         trampoline() do
-            partial(comp,store)() do _store, value
+            partial(comp,store)(address) do _store, value
                 currentexec += 1
                 returns[value] = get(returns, value, 0) + exp(ctx.score)
                 if maximumexec > 0 && currentexec == maximumexec
