@@ -4,11 +4,11 @@ using Base.Collections
 import Base: factor, show
 
 import Distributions
-import Distributions: Distribution, support, rand
+import Distributions: Distribution, support, rand, params
 const score = Distributions.logpdf
 
 export @pp, sample, factor, score, observe, mem, cache
-export Discrete, Dir, flip, randominteger, hellingerdistance
+export Discrete, Dir, flip, randominteger, hellingerdistance, kl
 
 const primitives = [:!,:+,:*,:-,:/,:sqrt,:√,
                     :tuple, :mem, :println, :cons, :list, :tail, :cat,
@@ -38,6 +38,7 @@ include("rand.jl")
 include("enumerate.jl")
 include("mh.jl")
 include("pmcmc.jl")
+include("variational.jl")
 include("dp.jl")
 include("plotting/gadfly.jl")
 include("plotting/pyplot.jl")
@@ -97,7 +98,7 @@ end
 import Base.==, Base.hash, Base.first, Base.isless
 export .., first, second, third, fourth, repeat
 
-using DataStructures: Cons, Nil, head, tail, cons, list
+using DataStructures: Cons, Nil, head, tail, cons, list, cat
 export cons, list
 
 const .. = cons

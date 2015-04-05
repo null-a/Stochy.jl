@@ -29,6 +29,13 @@ end
     ~Categorical(k)
 end
 
+# Gradient of the score (logpdf) w.r.t. the parameters.
+function gradient(erp::Bernoulli, x)
+    g = (x-erp.p) / (erp.p*(1-erp.p))
+    @assert isfinite(g)
+    [g]
+end
+
 immutable Discrete
     x::Vector
     p::Vector{Float64}
@@ -102,3 +109,13 @@ function hellingerdistance(p::ERP, q::Discrete)
     end
     sqrt(acc/2.)
 end
+
+function kl(p::ERP, q::ERP)
+    psupp = support(p)
+    qsupp = support(q)
+    @assert length(psupp) == length(qsupp)
+    for x in psupp; @assert x in qsupp; end
+    sum([exp(score(p,x)) * (score(p,x) - score(q,x)) for x in psupp])
+end
+
+kl(s::Store, k::Function, address, p::ERP, q::ERP) = k(s, kl(p,q))

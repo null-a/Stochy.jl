@@ -37,7 +37,7 @@ function sample(s::Store, k::Function, a, e::ERP, ctx::Enum)
     for val in support(e)
         enq!(ctx.unexplored, (ctx.score + score(e, val), () -> k(s,val), [ctx.path, val]))
     end
-    runnext()
+    runnext(ctx)
 end
 
 # @pp
@@ -46,7 +46,7 @@ function factor(s::Store, k::Function, a, score, ctx::Enum)
     k(s, nothing)
 end
 
-function runnext()
+function runnext(ctx::Ctx)
     score, cont, path = deq!(ctx.unexplored)
     ctx.score = score
     ctx.path = path
@@ -73,7 +73,7 @@ function enum(store::Store, k::Function, address, comp::Function, queuetype::Dat
                 if maximumexec > 0 && currentexec == maximumexec
                     info("Maximum executions reached.")
                 elseif !isempty(ctx.unexplored)
-                    runnext()
+                    runnext(ctx)
                 end
             end
         end
