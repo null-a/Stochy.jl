@@ -14,7 +14,7 @@ Variational() = Variational(Dict(), Dict(), 0, 0)
 function sample(s::Store, k::Function, address, erp::ERP, ctx::Variational)
     if !haskey(ctx.params, address)
         # Initialize variational parameters. Distributions.jl returns
-        # a tuple of params. Convert to array in order to use + to
+        # a tuple of params. Convert to an array in order to use + to
         # accumulate.
         ctx.params[address] = [params(erp)...]
     end
@@ -141,12 +141,12 @@ end
 
 factor(s::Store, k::Function, address, score, ctx::VarExec) = k(s,nothing)
 
-# It's neccesary to re-write the addresses of the params dictionary
+# It's necessary to re-write the addresses of the params dictionary
 # when executing the variational program returned by inference. This
 # is because the variational program will be executed from a different
-# point in the program than infererence was performed at. This need to
-# be accounted for when looking up the variational parameters for an
-# ERP during execution of the learned variational program.
+# point in the program than infererence was performed at. This needs
+# to be accounted for when looking up the variational parameters for
+# an ERP during execution of the learned variational program.
 
 function rewrite_param_addresses(params, oldprefix, newprefix)
     oldp = reverse(oldprefix)
