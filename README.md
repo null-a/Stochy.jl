@@ -4,8 +4,13 @@ Stochy is a probabilistic programming language embedded within Julia. Models are
 
 ## Status
 
-Stochy is in its infancy and you almost certainly want to use the most
-recent version. This can be installed from the Julia REPL like so:
+This project is no longer under development.
+
+If you're looking for an actively maintained and more fully featured system you might take a look at [WebPPL](http://webppl.org). (Stochy is basically a half-finished Julia port of WebPPL.) You'll find many more alternatives in this list of [probabilistic programming systems](http://probabilistic-programming.org/wiki/Home#Existing_probabilistic_programming_systems).
+
+## Installation
+
+Install the most recent revision from the Julia REPL like so:
 
 ```
 Pkg.add("Stochy")
